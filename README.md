@@ -2,11 +2,12 @@
 
 ## Environments
 ### Data processing
-The file `conda_spec-list.txt` specifies the conda environment used for all data processing tasks.
-A similar conda environment can be made using the command:
+A conda environment used for all data processing tasks. A similar conda environment can be made using the command:
 `conda create --prefix ./data_env`
 `conda activate ./data_env/`
-`conda install --file conda_spec-list.txt`
+`conda config --add channels conda-forge`
+`conda install sunpy astropy numpy drms requests scikit-image imageio pandas pillow opencv matplotlib`
+
 
 ### Training/Testing
 Training and testing of each GAN was done in a [Monarch](https://docs.monarch.erc.monash.edu/) environment created using the following commands:
@@ -15,4 +16,8 @@ Training and testing of each GAN was done in a [Monarch](https://docs.monarch.er
 `module load cudnn/7.6.5-cuda10.1`
 `module load tensorflow/2.3.0`
 
+## Pipeline
+### Data collection
+1. Download SDO AIA/HMI fits data: `./Scripts/data_collection.sh` or `sbatch ./Scripts/data_collection.sh` on Monarch
+2. 
 
