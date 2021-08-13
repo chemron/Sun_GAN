@@ -16,27 +16,39 @@
 #SBATCH --mail-user=csmi0005@student.monash.edu
 #SBATCH --mail-type=FAIL
 
-# load anaconda module on monarch
-module load 
+# >>> conda initialize >>> SPECIFIC TO MONARCH
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/usr/local/anaconda/2020.07-python3.8-gcc8/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/usr/local/anaconda/2020.07-python3.8-gcc8/etc/profile.d/conda.sh" ]; then
+        . "/usr/local/anaconda/2020.07-python3.8-gcc8/etc/profile.d/conda.sh"
+    else
+        export PATH="/usr/local/anaconda/2020.07-python3.8-gcc8/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<#
 
 # activate conda environmnt
 conda activate ./data_env
 
-# get SDO data
-python data_collection/get_SDO_data.py \
-        --instruments 'AIA' 'HMI' \
-        --start '2010-06-01 00:00:00' \
-        --end '2010-06-07 00:00:00' \
+# # get positional data for STEREO-A
+# python get_stereo_phase_times
 
-# get positional data for STEREO-A
-python get_stereo_phase_times
 
-# get STEREO DATA that overlaps with phase maps
-python data_collection/get_STEREO_data.py \
-        --start '2010-06-01 00:00:00' \
-        --end '2010-06-07 00:00:00' \
 
-# get phase maps (seismic data)
-python data_collection/get_seismic_data.py \
-        --start '2010-06-01 00:00:00' \
-        --end '2010-06-07 00:00:00' \
+# # get SDO data
+# python data_collection/get_SDO_STEREO_data.py \
+#         --instruments 'AIA' 'HMI' 'EUVI' \
+#         --start '2010-06-01 00:00:00' \
+#         --end '2010-06-07 00:00:00' \
+#         --cadence 12 \
+#         --path  './Data/' \
+#         --email "camerontasmith@gmail.com"
+
+# # get phase maps (seismic data)
+# python data_collection/get_seismic_data.py \
+#         --start '2010-06-01 00:00:00' \
+#         --end '2010-06-07 00:00:00' \

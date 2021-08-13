@@ -23,18 +23,9 @@ from urllib.error import HTTPError
 parser = argparse.ArgumentParser()
 parser.add_argument("--instruments",
                     nargs="+",
-                    help="<required> download data from these instruments",
-                    required=True
+                    help="Download data from these instruments",
+                    default=['AIA', 'HMI', 'EUVI']
                     )
-parser.add_argument("--series",
-                    nargs="+",
-                    help="series for each instrument in --Instrument list",
-                    default=['aia.lev1_euv_12s', 'hmi.m_45s'])
-parser.add_argument("--segment",
-                    nargs="+",
-                    help="segments for each instrument in --Instrument list."
-                         " Use \"None\" for None",
-                    default=['image', "magnetogram"])
 parser.add_argument("--start",
                     help="start date for AIA and HMI",
                     default='2010-06-01 00:00:00')
@@ -50,13 +41,6 @@ parser.add_argument("--path",
                     help="directory to store data",
                     default='./Data/'
                     )
-parser.add_argument("--wavelength",
-                    help="wavelength of images in angstroms"
-                         " Use 0 for None",
-                    nargs="+",
-                    type=int,
-                    default=[304, 0]
-                    )
 parser.add_argument("--email",
                     default="csmi0005@student.monash.edu")
 args = parser.parse_args()
@@ -64,10 +48,40 @@ args = parser.parse_args()
 email = args.email
 
 
-def get_data(name: str, series: str, segment: str, start: str, end: str,
-             cadence: int, wavelength: int, path: str, fmt: str):
+def get_search_args(instrument: str, wavelength: int,  series: str, segment: str):
 
     wavelength = wavelength*u.AA
+    search_args = []
+    if series == "STEREO_A":
+        # args for stereo data
+        search_args = [
+            a.Wavelength(wavelength),
+            a.Source(series),
+            a.Instrument(instrument),
+            a.Sample(12*u.hour)
+        ]
+    else:
+        # args for SDO data
+        print(segment)
+        search_args = [
+            a.jsoc.Notify(email),
+            a.jsoc.Series(series),
+            a.jsoc.Segment(segment),
+            a.Sample(12*u.hour)
+            ]
+
+        if wavelength != 0:
+            search_args.append(a.jsoc.Wavelength(wavelength))
+
+    return search_args
+
+
+def get_data(instrument: str, start: str, end: str, cadence: int,
+              path: str, fmt: str, arg_no_time: list):
+    
+    path = f"{path}fits_{instrument}/"
+    # time between searches
+    cadence = timedelta(hours=cadence)
     # start time for downloading
     s_time = datetime.fromisoformat(start)
     # time of end of downloading
@@ -76,9 +90,6 @@ def get_data(name: str, series: str, segment: str, start: str, end: str,
     step_time = timedelta(days=8)
     # time of end of this step:
     e_time = s_time + step_time
-    # time between searches
-    cadence = timedelta(hours=cadence)
-    path = f"{path}fits_{name}/"
 
     while True:
         if e_time > f_time:
@@ -86,17 +97,19 @@ def get_data(name: str, series: str, segment: str, start: str, end: str,
 
         start = s_time.strftime("%Y-%m-%d %H:%M:%S")
         end = e_time.strftime("%Y-%m-%d %H:%M:%S")
-        arg = [a.Time(start, end),
-               a.jsoc.Notify(email),
-               a.jsoc.Series(series),
-               a.jsoc.Segment(segment),
-               a.Sample(12*u.hour)
-               ]
 
-        if wavelength != 0:
-            arg.append(a.jsoc.Wavelength(wavelength))
+        arg = arg_no_time + [a.Time(start, end)]
 
         res = Fido.search(*arg)
+
+        if instrument == "EUVI":
+            Fido.fetch(res, path=path)
+            # start of next run:
+            if e_time >= f_time:
+                return
+            s_time = e_time
+            e_time += step_time
+            continue            
 
         # get response object:
         table = res.tables[0]
@@ -114,6 +127,18 @@ def get_data(name: str, series: str, segment: str, start: str, end: str,
 
         # get times:
         times = []
+
+        # slightly different formatting for STEREO and SDO
+        # if instrument == "EUVI":
+        #         for t in table["Start Time"]:
+        #             t = str(t).strip('.000')
+        #             # account for leap second in 2016
+        #             if t == "2016-12-31 23:59:60":
+        #                 time = "2017-01-01 00:00:00"
+        #             else:
+        #                 time = t
+        #             times.append(datetime.strptime(time, fmt))
+        # else:
         for t in table["T_REC"]:
             # account for leap second in 2016
             if t == "2016-12-31T23:59:60Z":
@@ -127,7 +152,7 @@ def get_data(name: str, series: str, segment: str, start: str, end: str,
 
         print(index)
 
-        request = get_request(res, index)
+        request = get_request(instrument, res, index)
 
         if request.has_failed():
             s_time = e_time
@@ -140,10 +165,10 @@ def get_data(name: str, series: str, segment: str, start: str, end: str,
 
         filenames = []
 
-        for url, date in zip(urls, dates):
+        for date in  dates:
             if date.hour == 11 or date.hour == 23:
                 date += timedelta(hours=1)
-            filename = f"{path}{name}_{date.year}.{date.month:0>2}." \
+            filename = f"{path}{instrument}_{date.year}.{date.month:0>2}." \
                        f"{date.day:0>2}_{date.hour:0>2}:00:00.fits"
             filenames.append(filename)
 
@@ -198,23 +223,26 @@ def get_index(times, start: datetime, end: datetime, cadence: timedelta):
     return index, dates
 
 
-def get_request(res, index):
-    # get response
-    jsoc_response = list(res.responses)[0]
-    # get block (info about response)
-    block = jsoc_response.query_args[0]
-    # data string
-    ds = jsoc_response.client._make_recordset(**block)
-    # client for drms
-    cd = drms.Client(email=block.get('notify', ''))
-    request = cd.export(ds, method='url', protocol='fits')
+def get_request(instrument, res, index):
+    if instrument == "EUVI":
+        pass
+    else:
+        # get response
+        jsoc_response = list(res.responses)[0]
+        # get block (info about response)
+        block = jsoc_response.query_args[0]
+        # data string
+        ds = jsoc_response.client._make_recordset(**block)
+        # client for drms
+        cd = drms.Client(email=block.get('notify', ''))
+        request = cd.export(ds, method='url', protocol='fits')
 
-    print("waiting for request", end="")
-    while request.status == 0:
-        print(".", end="")
-        time.sleep(5)
+        print("waiting for request", end="")
+        while request.status == 0:
+            print(".", end="")
+            time.sleep(5)
 
-    print("\ndone")
+        print("\ndone")
 
     return request
 
@@ -233,30 +261,40 @@ def download_url(url, filename):
 
 # number of instruments
 n = len(args.instruments)
-
 for i in range(n):
     # date string format
     if args.instruments[i] == "AIA":
         fmt = "%Y-%m-%dT%H:%M:%SZ"
+        wavelength = 304
+        series = 'aia.lev1_euv_12s'
+        segment = 'image'
     elif args.instruments[i] == "HMI":
         fmt = '%Y.%m.%d_%H:%M:%S_TAI'
+        wavelength = 0
+        series = 'hmi.m_45s'
+        segment = "magnetogram"
+    elif args.instruments[i] == "EUVI":
+        fmt = "%Y-%m-%d %H:%M:%S"
+        wavelength = 304
+        series = 'STEREO_A'
+        segment = None
     else:
-        raise Exception("Only accepts AIA or HMI instrument")
+        raise Exception("Only accepts AIA, HMI or EUVI instrument")
 
-    print(args.instruments[i],
-          args.segment[i],
-          args.series[i],
-          args.start,
-          args.end,
-          args.cadence,
-          args.wavelength[i],
-          args.path)
-    get_data(name=args.instruments[i],
-             segment=args.segment[i],
-             series=args.series[i],
+    
+    # get search args (excluding start/end times)
+    arg_no_time = get_search_args(
+        instrument=args.instruments[i],
+        wavelength=wavelength,
+        segment=segment,
+        series=series
+        )
+
+    # get data
+    get_data(instrument=args.instruments[i],
              start=args.start,
              end=args.end,
              cadence=args.cadence,
-             wavelength=args.wavelength[i],
              path=args.path,
-             fmt=fmt)
+             fmt=fmt,
+             arg_no_time=arg_no_time)

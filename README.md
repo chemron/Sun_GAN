@@ -18,6 +18,7 @@ Training and testing of each GAN was done in a [Monarch](https://docs.monarch.er
 
 ## Pipeline
 ### Data collection
-1. Download SDO AIA/HMI fits data: `./Scripts/data_collection.sh` or `sbatch ./Scripts/data_collection.sh` on Monarch
-2. 
+Download fits data (SDO AIA/HMI, STEREO EUVI and phase maps): `./Scripts/data_collection.sh` or `sbatch ./Scripts/data_collection.sh` on Monarch
+### Data processing
+
 
