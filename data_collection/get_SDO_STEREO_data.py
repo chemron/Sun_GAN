@@ -62,7 +62,6 @@ def get_search_args(instrument: str, wavelength: int,  series: str, segment: str
         ]
     else:
         # args for SDO data
-        print(segment)
         search_args = [
             a.jsoc.Notify(email),
             a.jsoc.Series(series),
@@ -76,22 +75,7 @@ def get_search_args(instrument: str, wavelength: int,  series: str, segment: str
     return search_args
 
 
-def get_data(instrument: str, start: str, end: str, cadence: int,
-              path: str, fmt: str, arg_no_time: list):
-    
-    path = f"{path}fits_{instrument}/"
-    # time between searches
-    cadence = timedelta(hours=cadence)
-    # start time for downloading
-    s_time = datetime.fromisoformat(start)
-    # time of end of downloading
-    f_time = datetime.fromisoformat(end)
-    # take data from 10 days at a time
-    step_time = timedelta(days=8)
-    # time of end of this step:
-    e_time = s_time + step_time
-
-    while True:
+def search_data(s_time, f_time, e_time):
         if e_time > f_time:
             e_time = f_time
 
@@ -101,16 +85,28 @@ def get_data(instrument: str, start: str, end: str, cadence: int,
         arg = arg_no_time + [a.Time(start, end)]
 
         res = Fido.search(*arg)
+        return res
 
-        if instrument == "EUVI":
-            Fido.fetch(res, path=path)
-            # start of next run:
-            if e_time >= f_time:
-                return
-            s_time = e_time
-            e_time += step_time
-            continue            
 
+
+def get_SDO_data(instrument: str, start: str, end: str, cadence: int,
+              path: str, fmt: str, arg_no_time: list):
+    
+    path = f"{path}fits_{instrument}/"
+    # time between searches
+    cadence = timedelta(hours=cadence)
+    # start time for downloading
+    s_time = datetime.fromisoformat(start)
+    # time of end of downloading
+    f_time = datetime.fromisoformat(end)
+    # take data from 8 days at a time
+    step_time = timedelta(days=8)
+    # time of end of this step:
+    e_time = s_time + step_time
+
+    while True:
+        res = search_data(s_time, f_time, e_time)
+        
         # get response object:
         table = res.tables[0]
 
@@ -150,8 +146,6 @@ def get_data(instrument: str, start: str, end: str, cadence: int,
 
         index, dates = get_index(times, s_time, e_time, cadence)
 
-        print(index)
-
         request = get_request(instrument, res, index)
 
         if request.has_failed():
@@ -187,6 +181,7 @@ def get_data(instrument: str, start: str, end: str, cadence: int,
         pool.close()
         pool.join()
 
+
         # start of next run:
         if e_time >= f_time:
             return
@@ -195,6 +190,36 @@ def get_data(instrument: str, start: str, end: str, cadence: int,
         e_time += step_time
 
 
+def get_STEREO_data(instrument: str, start: str, end: str, cadence: int,
+              path: str, fmt: str, arg_no_time: list):
+    
+    path = f"{path}fits_{instrument}/"
+    # time between searches
+    cadence = timedelta(hours=cadence)
+    # start time for downloading
+    s_time = datetime.fromisoformat(start)
+    # time of end of downloading
+    f_time = datetime.fromisoformat(end)
+    # take data from 8 days at a time
+    step_time = timedelta(days=8)
+    # time of end of this step:
+    e_time = s_time + step_time
+
+    while True:
+        res = search_data(s_time, f_time, e_time)
+
+        Fido.fetch(res, path=path)
+
+        # start of next run:
+        if e_time >= f_time:
+            return
+
+        s_time = e_time
+        e_time += step_time
+
+
+
+        
 def get_index(times, start: datetime, end: datetime, cadence: timedelta):
     # get index and dates of every cadence timestep in times
     index = []
@@ -259,21 +284,19 @@ def download_url(url, filename):
         return
 
 
-# number of instruments
-n = len(args.instruments)
-for i in range(n):
+for instrument in args.instruments:
     # date string format
-    if args.instruments[i] == "AIA":
+    if instrument == "AIA":
         fmt = "%Y-%m-%dT%H:%M:%SZ"
         wavelength = 304
         series = 'aia.lev1_euv_12s'
         segment = 'image'
-    elif args.instruments[i] == "HMI":
+    elif instrument == "HMI":
         fmt = '%Y.%m.%d_%H:%M:%S_TAI'
         wavelength = 0
         series = 'hmi.m_45s'
         segment = "magnetogram"
-    elif args.instruments[i] == "EUVI":
+    elif instrument == "EUVI":
         fmt = "%Y-%m-%d %H:%M:%S"
         wavelength = 304
         series = 'STEREO_A'
@@ -284,17 +307,27 @@ for i in range(n):
     
     # get search args (excluding start/end times)
     arg_no_time = get_search_args(
-        instrument=args.instruments[i],
+        instrument=instrument,
         wavelength=wavelength,
         segment=segment,
         series=series
         )
 
     # get data
-    get_data(instrument=args.instruments[i],
-             start=args.start,
-             end=args.end,
-             cadence=args.cadence,
-             path=args.path,
-             fmt=fmt,
-             arg_no_time=arg_no_time)
+    if instrument == "EUVI":    
+        get_STEREO_data(instrument=instrument,
+            start=args.start,
+            end=args.end,
+            cadence=args.cadence,
+            path=args.path,
+            fmt=fmt,
+            arg_no_time=arg_no_time)
+    
+    else:
+        get_SDO_data(instrument=instrument,
+            start=args.start,
+            end=args.end,
+            cadence=args.cadence,
+            path=args.path,
+            fmt=fmt,
+            arg_no_time=arg_no_time)

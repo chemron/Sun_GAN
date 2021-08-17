@@ -39,7 +39,7 @@ conda activate ./data_env
 
 
 
-# # get SDO data
+# # get SDO (AIA/HMI) and STEREO (EUVI) data
 # python data_collection/get_SDO_STEREO_data.py \
 #         --instruments 'AIA' 'HMI' 'EUVI' \
 #         --start '2010-06-01 00:00:00' \
@@ -52,3 +52,10 @@ conda activate ./data_env
 # python data_collection/get_seismic_data.py \
 #         --start '2010-06-01 00:00:00' \
 #         --end '2010-06-07 00:00:00' \
+
+
+python data_collection/get_SDO_STEREO_data.py \
+        --instruments 'AIA' 'HMI' \
+        --start '2010-06-01 00:00:00' \
+        --end '2010-06-07 00:00:00' \
+
