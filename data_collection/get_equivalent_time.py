@@ -2,9 +2,7 @@ from bisect import bisect_left
 import numpy as np
 from datetime import timedelta
 
-phase_times, stereo_times = np.load("/home/csmi0005/Mona0028/adonea/" +
-                                    "cameron/Honours/data_collection/" +
-                                    "DATA/np_objects/phase_stereo_times.npy",
+phase_times, stereo_times = np.load("./Data/np_objects/phase_stereo_times.npy",
                                     allow_pickle=True).T
 
 

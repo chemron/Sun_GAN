@@ -35,7 +35,7 @@ unset __conda_setup
 conda activate ./data_env
 
 # # get positional data for STEREO-A
-# python get_stereo_phase_times
+# python data_collection/get_stereo_phase_times.py
 
 
 
@@ -55,7 +55,7 @@ conda activate ./data_env
 
 
 python data_collection/get_SDO_STEREO_data.py \
-        --instruments 'AIA' 'HMI' \
+        --instruments 'EUVI' \
         --start '2010-06-01 00:00:00' \
-        --end '2010-06-07 00:00:00' \
+        --end '2010-06-04 00:00:00' \
 

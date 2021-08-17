@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # Python code for retrieving SDO-HMI/AIA data
+from email.mime import base
 from sunpy.net import Fido, attrs as a
+import numpy as np
 
 from datetime import datetime, timedelta
+from get_equivalent_time import get_stereo_time
 import astropy.units as u  # for AIA
 import argparse
 import numpy as np
@@ -11,6 +14,8 @@ import requests
 from multiprocessing import Pool, cpu_count
 import drms
 import time
+from bs4 import BeautifulSoup
+import requests
 
 from requests.exceptions import ConnectionError
 from urllib.error import HTTPError
@@ -58,7 +63,6 @@ def get_search_args(instrument: str, wavelength: int,  series: str, segment: str
             a.Wavelength(wavelength),
             a.Source(series),
             a.Instrument(instrument),
-            a.Sample(12*u.hour)
         ]
     else:
         # args for SDO data
@@ -73,19 +77,6 @@ def get_search_args(instrument: str, wavelength: int,  series: str, segment: str
             search_args.append(a.jsoc.Wavelength(wavelength))
 
     return search_args
-
-
-def search_data(s_time, f_time, e_time):
-        if e_time > f_time:
-            e_time = f_time
-
-        start = s_time.strftime("%Y-%m-%d %H:%M:%S")
-        end = e_time.strftime("%Y-%m-%d %H:%M:%S")
-
-        arg = arg_no_time + [a.Time(start, end)]
-
-        res = Fido.search(*arg)
-        return res
 
 
 
@@ -105,7 +96,15 @@ def get_SDO_data(instrument: str, start: str, end: str, cadence: int,
     e_time = s_time + step_time
 
     while True:
-        res = search_data(s_time, f_time, e_time)
+        if e_time > f_time:
+            e_time = f_time
+
+        start = s_time.strftime("%Y-%m-%d %H:%M:%S")
+        end = e_time.strftime("%Y-%m-%d %H:%M:%S")
+
+        arg = arg_no_time + [a.Time(start, end)]
+
+        res = Fido.search(*arg)
         
         # get response object:
         table = res.tables[0]
@@ -124,17 +123,7 @@ def get_SDO_data(instrument: str, start: str, end: str, cadence: int,
         # get times:
         times = []
 
-        # slightly different formatting for STEREO and SDO
-        # if instrument == "EUVI":
-        #         for t in table["Start Time"]:
-        #             t = str(t).strip('.000')
-        #             # account for leap second in 2016
-        #             if t == "2016-12-31 23:59:60":
-        #                 time = "2017-01-01 00:00:00"
-        #             else:
-        #                 time = t
-        #             times.append(datetime.strptime(time, fmt))
-        # else:
+
         for t in table["T_REC"]:
             # account for leap second in 2016
             if t == "2016-12-31T23:59:60Z":
@@ -144,7 +133,7 @@ def get_SDO_data(instrument: str, start: str, end: str, cadence: int,
             times.append(datetime.strptime(time, fmt))
         times = np.array(times)
 
-        index, dates = get_index(times, s_time, e_time, cadence)
+        index, dates = get_index_SDO(times, s_time, e_time, cadence)
 
         request = get_request(instrument, res, index)
 
@@ -190,12 +179,10 @@ def get_SDO_data(instrument: str, start: str, end: str, cadence: int,
         e_time += step_time
 
 
-def get_STEREO_data(instrument: str, start: str, end: str, cadence: int,
+def get_STEREO_data(instrument: str, start: str, end: str,
               path: str, fmt: str, arg_no_time: list):
     
     path = f"{path}fits_{instrument}/"
-    # time between searches
-    cadence = timedelta(hours=cadence)
     # start time for downloading
     s_time = datetime.fromisoformat(start)
     # time of end of downloading
@@ -204,23 +191,107 @@ def get_STEREO_data(instrument: str, start: str, end: str, cadence: int,
     step_time = timedelta(days=8)
     # time of end of this step:
     e_time = s_time + step_time
+    # time of end of this step:
+    e_time = s_time + step_time
 
     while True:
-        res = search_data(s_time, f_time, e_time)
+        if e_time > f_time:
+            e_time = f_time
 
-        Fido.fetch(res, path=path)
+        phase_times = []
+        t = s_time
+        while t < e_time:
+            phase_times.append(t)
+            t += timedelta(hours=12)
 
-        # start of next run:
-        if e_time >= f_time:
-            return
+        stereo_times = np.array([get_stereo_time(p) for p in phase_times])
+
+        # start time of stereo
+        stereo_s_time = stereo_times[0]
+        # end time of stereo
+        stereo_e_time = stereo_times[-1]
+
+        stereo_start = stereo_s_time.strftime("%Y-%m-%d %H:%M:%S")
+        stereo_end = stereo_e_time.strftime("%Y-%m-%d %H:%M:%S")
+
+        print(f"getting data between {stereo_start} and {stereo_end}")
+
+        arg = arg_no_time + [a.Time(stereo_start, stereo_end)]
+
+        res = Fido.search(*arg)
+        # get response object:
+        table = res.tables[0]
+
+        # get time string of final end time of results
+        if len(table) == 0:
+            print(f"{s_time} to {e_time}: Empty table")
+            if e_time >= f_time:
+                print("finish on empty table")
+                break
+            else:
+                s_time = e_time
+                e_time += step_time
+                continue
+
+        all_times = list([t.tt.datetime for t in table["Start Time"]])
+        all_times = np.array(all_times)
+
+
+        # times which to download STEREO data
+        download_times = get_closest_time_STEREO(all_times, stereo_times)
+
+        
+        urls, times = get_STEREO_urls(download_times)
+        print(list(zip(urls, times)))
+
+        # TODO: keep going
+        break
 
         s_time = e_time
-        e_time += step_time
+        if s_time == f_time:
+            break
+        e_time = s_time + step_time
+
+
+def get_STEREO_urls(download_times):
+    """ get the urls of the stereo images corresponding to the times in download_times"""
+
+    base_url = "https://stereo-ssc.nascom.nasa.gov/data/ins_data/secchi/L0/a/img/euvi/"
+    url = ""
+    fits_files = []
+    urls = []
+    times = []
+    soup = None
+    for time in download_times:
+        date_string = f"{time.year}{time.month:0>2}{time.day:0>2}"
+        new_url = f"{base_url}{date_string}/"
+        if new_url != url:
+            try:
+                web_page = requests.get(new_url)
+            except Exception as e:
+                print(f"Got exception: '{e}' when requesting url: '{new_url}'")
+                continue
+            soup = BeautifulSoup(web_page.text, 'html.parser')
+            fits_files = [node.get('href') for node in soup.find_all('a') if node.get('href').endswith('fts')]
+
+        file_sub_string = f"{date_string}_{time.hour:0>2}{time.minute:0>2}"
+        file_index = np.searchsorted(fits_files, file_sub_string)
+        file = fits_files[file_index]
+        full_url = new_url + file
+
+        urls.append(full_url)
+        times.append(time)
+        url = new_url
+    
+    return urls, times
+# ps://stereo-ssc.nascom.nasa.gov/data/ins_data/secchi/L0/a/img/euvi/20200111//20200111_000530_n4euA.fts
+
+
 
 
 
         
-def get_index(times, start: datetime, end: datetime, cadence: timedelta):
+def get_index_SDO(times, start: datetime, end: datetime, cadence: timedelta):
     # get index and dates of every cadence timestep in times
     index = []
     dates = []
@@ -246,6 +317,43 @@ def get_index(times, start: datetime, end: datetime, cadence: timedelta):
         i += 1
 
     return index, dates
+
+
+def get_closest_time_STEREO(all_times, stereo_times):
+    # tolerance for closest time
+    tol = timedelta(hours=1)
+
+    # index of right/left insertion points
+    closest_right_i = np.searchsorted(all_times, stereo_times)
+    closest_left_i = closest_right_i - 1
+
+    closest_right_i = np.clip(closest_right_i, 0, len(all_times)-1)
+    closest_left_i = np.clip(closest_left_i, 0, len(all_times)-1)
+
+    # value of right/left insertion points
+    closest_right = all_times[closest_right_i]
+    closest_left = all_times[closest_left_i]
+
+    # difference between value of right/left insertion points and stereo times 
+    difference_right = np.abs(closest_right-stereo_times)
+    difference_left = np.abs(closest_left-stereo_times)
+
+    # true if right index is closer, false if left index is closer
+    right_closer = difference_right < difference_left
+
+    # index of closest elements
+    closest_i = closest_right_i * right_closer + closest_left_i * (1 - right_closer)
+
+    closest_values = all_times[closest_i]
+
+    difference = np.abs(closest_values - stereo_times)
+    
+    closest_i = closest_i[difference < tol]
+
+    closest = all_times[closest_i]
+
+    return closest
+
 
 
 def get_request(instrument, res, index):
@@ -318,7 +426,6 @@ for instrument in args.instruments:
         get_STEREO_data(instrument=instrument,
             start=args.start,
             end=args.end,
-            cadence=args.cadence,
             path=args.path,
             fmt=fmt,
             arg_no_time=arg_no_time)
