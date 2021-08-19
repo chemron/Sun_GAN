@@ -144,32 +144,7 @@ def get_SDO_data(instrument: str, start: str, end: str, cadence: int,
 
         urls = request.urls.url.reindex(index).dropna()
 
-        os.makedirs(path) if not os.path.exists(path) else None
-
-        filenames = []
-
-        for date in  dates:
-            if date.hour == 11 or date.hour == 23:
-                date += timedelta(hours=1)
-            filename = f"{path}{instrument}_{date.year}.{date.month:0>2}." \
-                       f"{date.day:0>2}_{date.hour:0>2}:00:00.fits"
-            filenames.append(filename)
-
-        n_cpus = min(cpu_count(), 8)
-        print(f"downloading {len(urls)} files with {n_cpus} cpus.")
-        pool = Pool(n_cpus)
-        arg = list(zip(urls, filenames))
-        try:
-            pool.starmap(download_url, arg)
-        except ConnectionError as e:
-            print(e)
-        except HTTPError as e:
-            print(e)
-            print("Could not download:")
-            print(arg)
-        pool.close()
-        pool.join()
-
+        download_data(urls, path, dates, instrument)        
 
         # start of next run:
         if e_time >= f_time:
@@ -244,8 +219,7 @@ def get_STEREO_data(instrument: str, start: str, end: str,
         urls, times = get_STEREO_urls(download_times)
         print(list(zip(urls, times)))
 
-        # TODO: keep going
-        break
+        download_data(urls, path, times, instrument)
 
         s_time = e_time
         if s_time == f_time:
@@ -378,6 +352,34 @@ def get_request(instrument, res, index):
         print("\ndone")
 
     return request
+
+
+def download_data(urls, path, dates, instrument):
+    os.makedirs(path) if not os.path.exists(path) else None
+
+    filenames = []
+
+    for date in  dates:
+        if date.hour == 11 or date.hour == 23:
+            date += timedelta(hours=1)
+        filename = f"{path}{instrument}_{date.year}.{date.month:0>2}." \
+                    f"{date.day:0>2}_{date.hour:0>2}:00:00.fits"
+        filenames.append(filename)
+
+    n_cpus = min(cpu_count(), 8)
+    print(f"downloading {len(urls)} files with {n_cpus} cpus.")
+    pool = Pool(n_cpus)
+    arg = list(zip(urls, filenames))
+    try:
+        pool.starmap(download_url, arg)
+    except ConnectionError as e:
+        print(e)
+    except HTTPError as e:
+        print(e)
+        print("Could not download:")
+        print(arg)
+    pool.close()
+    pool.join()
 
 
 def download_url(url, filename):
