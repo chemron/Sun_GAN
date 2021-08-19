@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=data_collection
+#SBATCH --job-name=fits_to_np
 
 # Request CPU resource for a serial job
 #SBATCH --ntasks=1
@@ -32,27 +32,13 @@ unset __conda_setup
 conda config --add pkgs_dirs /home/csmi0005/Mona0028/csmi0005/conda/pkgs
 # <<< conda initialize <<<#
 
-# activate conda environment
+# activate conda environmnt
 conda activate ./data_env
 
 
-echo "Getting STEREO-A positional data"
-# get positional data for STEREO-A
-python data_collection/get_stereo_phase_times.py
-
-
-echo "Getting AIA, HMI, EUVI fits data"
-# get SDO (AIA/HMI) and STEREO (EUVI) data
-python data_collection/get_SDO_STEREO_data.py \
-        --instruments 'AIA' 'HMI' 'EUVI' \
-        --start '2010-06-01 00:00:00' \
-        --end '2010-06-07 00:00:00' \
-        --cadence 12 \
-        --path  './Data/' \
-        --email "camerontasmith@gmail.com"
-
-echo "Getting farside siesmic fits data"
-# get phase maps (seismic data)
-python data_collection/get_seismic_data.py \
-        --start '2010-06-01 00:00:00' \
-        --end '2010-06-07 00:00:00' \
+for Instrument in AIA HMI EUVI phase_map
+do
+    echo "Processing ${Instrument} data"
+    python data_collection/fits_to_np.py \
+            --data $Instrument
+done
