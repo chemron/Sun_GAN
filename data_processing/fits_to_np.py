@@ -124,13 +124,7 @@ def get_percentiles(filename):
 def append_date(name):
     date_str = name.replace(".", "").replace(":", "")
     date_str = date_str.split("_")
-    if mode == "AIA" or mode == "HMI":
-        # date string is after first "_"
-        date_str = date_str[1] + date_str[2]
-    elif mode == "stereo":
-        date_str = date_str[0] + date_str[1]
-    elif mode == "phase_map":
-        date_str = date_str[2] + date_str[3]
+    date_str = date_str[-2] + date_str[-1]
     dates.append(date_str)
 
 
