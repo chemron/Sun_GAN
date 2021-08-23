@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=data_processing
+#SBATCH --job-name=data_normalisation
 
 # Request CPU resource for a serial job
 #SBATCH --ntasks=1
@@ -36,11 +36,11 @@ conda config --add pkgs_dirs /home/csmi0005/Mona0028/csmi0005/conda/pkgs
 conda activate ./Data_env
 
 echo "normalising EUV data"
-# python data_processing/normalise_EUV_data.py
+python Data_processing/normalise_EUV_data.py
 
 
 echo "normalising HMI data"
-python data_processing/normalise_mag_data.py
+python Data_processing/normalise_mag_data.py
 
 
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=data_collection
+#SBATCH --job-name=Data_collection
 
 # Request CPU resource for a serial job
 #SBATCH --ntasks=1
@@ -38,12 +38,12 @@ conda activate ./Data_env
 
 echo "Getting STEREO-A positional data"
 # get positional data for STEREO-A
-python data_collection/get_stereo_phase_times.py
+python Data_collection/get_stereo_phase_times.py
 
 
 echo "Getting AIA, HMI, EUVI fits data"
 # get SDO (AIA/HMI) and STEREO (EUVI) data
-python data_collection/get_SDO_STEREO_data.py \
+python Data_collection/get_SDO_STEREO_data.py \
         --instruments 'AIA' 'HMI' 'EUVI' \
         --start '2010-06-01 00:00:00' \
         --end '2010-06-07 00:00:00' \
@@ -53,6 +53,6 @@ python data_collection/get_SDO_STEREO_data.py \
 
 echo "Getting farside siesmic fits data"
 # get phase maps (seismic data)
-python data_collection/get_seismic_data.py \
+python Data_collection/get_seismic_data.py \
         --start '2010-06-01 00:00:00' \
         --end '2010-06-07 00:00:00' \

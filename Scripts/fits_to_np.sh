@@ -39,6 +39,6 @@ conda activate ./Data_env
 for Instrument in AIA HMI EUVI phase_map
 do
     echo "Processing ${Instrument} data"
-    python data_collection/fits_to_np.py \
+    python Data_collection/fits_to_np.py \
             --data $Instrument
 done

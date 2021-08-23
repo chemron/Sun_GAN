@@ -145,15 +145,15 @@ def normalise_EUVI_p(zero_point, percentiles, datetime_dates):
 
 def normalise_data(mode, rolling_75p, clip_max, outlier_indicies, zero_point):
     w = h = 1024  # desired width and height of output
-    n = 50
     np_dir = f"Data/np_{mode}/"
     normal_np_dir = f"Data/np_{mode}_normalised/"
     os.makedirs(normal_np_dir) if not os.path.exists(normal_np_dir) else None
 
     data = np.sort(os.listdir(np_dir))
     data = np.delete(data, outlier_indicies)
-    data = data[n//2:-n//2]
-
+    data = data[n//2-1:-n//2]
+    print(len(data))
+    print(len(rolling_75p))
     assert len(rolling_75p) == len(data)
 
     # normal percentiles and corresponding dates
