@@ -57,5 +57,5 @@ for i in range(len(data)):
 percentile_dir = "Data/np_objects/"
 os.makedirs(percentile_dir) if not os.path.exists(percentile_dir) else None
 
-np.save(f"{percentile_dir}HMI_normal_p", normal_p)
-np.save(f"{percentile_dir}HMI_normal_d", normal_d)
+np.save(f"{percentile_dir}HMI_normal_percentiles", normal_p)
+np.save(f"{percentile_dir}HMI_normal_dates", normal_d)

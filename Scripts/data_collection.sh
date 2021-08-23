@@ -33,7 +33,7 @@ conda config --add pkgs_dirs /home/csmi0005/Mona0028/csmi0005/conda/pkgs
 # <<< conda initialize <<<#
 
 # activate conda environment
-conda activate ./data_env
+conda activate ./Data_env
 
 
 echo "Getting STEREO-A positional data"

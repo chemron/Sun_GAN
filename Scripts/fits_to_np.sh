@@ -33,7 +33,7 @@ conda config --add pkgs_dirs /home/csmi0005/Mona0028/csmi0005/conda/pkgs
 # <<< conda initialize <<<#
 
 # activate conda environmnt
-conda activate ./data_env
+conda activate ./Data_env
 
 
 for Instrument in AIA HMI EUVI phase_map
