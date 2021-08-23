@@ -26,7 +26,9 @@ The STEREO data is downloaded such that it is synchronised with the phase maps.
 
 ### Data processing
 1. Convert fits data into local numpy arrays (.npy), and get percentiles of the data: `./Scripts/fits_to_np.sh` or `sbatch ./Scripts/fits_to_np.sh` on Monarch.
-2. 
+2. normalise the data SDO and STEREO (remove outliers, change saturation and
+   make EUV data consistant - see
+   [thesis](https://github.com/chemron/honours_thesis/blob/master/thesis.pdf)): `./Scripts/data_normalisation.sh` or `sbatch ./Scripts/data_normalisation` on Monarch
 
 ## Pipeline: UV-GAN
 The pipeline for generating magnetograms from EUV 304 Angstrom full-disk solar images.
