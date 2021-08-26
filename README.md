@@ -26,7 +26,7 @@ following commands:
 ## Pipeline: Data Preparation
 The pipeline for downloading and preparing the data used throughout this project.
 ### Data collection
-Download fits data (SDO AIA/HMI, STEREO EUVI and phase maps):
+Download fits data (SDO AIA/HMI, STEREO EUVI and phase maps):  
   `./Scripts/Data_collection.sh` or  
   `sbatch ./Scripts/Data_collection.sh` (Monarch).  
 The STEREO data is downloaded such that it is synchronised with the phase maps.
@@ -38,8 +38,7 @@ The STEREO data is downloaded such that it is synchronised with the phase maps.
    `sbatch ./Scripts/fits_to_np.sh` (Monarch).
 2. Normalise the data SDO and STEREO (remove outliers, change saturation and
    make EUV data consistant - see
-   [thesis](https://github.com/chemron/honours_thesis/blob/master/thesis.pdf)):
-   
+   [thesis](https://github.com/chemron/honours_thesis/blob/master/thesis.pdf)):   
    `./Scripts/Data_normalisation.sh` or   
    `sbatch ./Scripts/Data_normalisation` (Monarch)
 3. Create database (`image.db`) that maps the connections between the different
