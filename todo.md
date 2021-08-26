@@ -1,3 +1,4 @@
 1. make database for data
-2. reproject data
-3. training and testing
+2. fix normalise euv - currently cuts of end data
+3. reproject data
+4. training and testing
