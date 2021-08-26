@@ -27,7 +27,7 @@ def remove_outliers(mode):
     np_dir = f"Data/np_{mode}/"
 
     percentiles = np.load(f"Data/np_objects/{mode}_percentiles.npy").T
-    datetime_dates = np.load(f"Data/np_objects/{mode}_dates.npy")
+    datetime_dates = np.load(f"Data/np_objects/{mode}_dates.npy", allow_pickle=True)
 
     lower_cutoff, upper_cutoff = get_cutoff(mode, datetime_dates)
 
