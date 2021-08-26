@@ -3,6 +3,7 @@ import numpy as np
 import sunpy
 import sunpy.map
 from astropy.io import fits
+from datetime import datetime
 from astropy.coordinates import SkyCoord
 import argparse
 
@@ -140,5 +141,7 @@ if len(percentiles) != len(dates):
 percentile_dir = "Data/np_objects/"
 os.makedirs(percentile_dir) if not os.path.exists(percentile_dir) else None
 
+dates = [datetime.strptime(date, "%Y%m%d%H%M%S")
+                    for date in dates]
 np.save(f"{percentile_dir}{mode}_percentiles", percentiles)
 np.save(f"{percentile_dir}{mode}_dates", dates)
