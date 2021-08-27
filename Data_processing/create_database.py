@@ -4,8 +4,9 @@ import numpy as np
 from datetime import datetime, timedelta
 import os
 from bisect import bisect_left
-import Data_collection
-from Data_collection.get_equivalent_time import get_stereo_time
+import sys
+sys.path.insert(1, './Data_collection')
+from get_equivalent_time import get_stereo_time
 
 
 def create_connection(path):
