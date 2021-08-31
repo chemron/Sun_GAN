@@ -53,3 +53,5 @@ The pipeline for generating magnetograms from EUV 304 Angstrom full-disk solar i
 ## Plotting:
 - Plot percentiles of the different data types: 
    `python Plotting/plot_percentiles.py`
+- View a numpy array from file (enter in path to file when prompted): 
+   `python Plotting/view_specific_npy.py`
