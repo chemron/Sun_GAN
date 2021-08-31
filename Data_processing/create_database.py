@@ -5,48 +5,15 @@ from datetime import datetime, timedelta
 import os
 from bisect import bisect_left
 import sys
+from sql_util import create_connection, execute_query, execute_read_query
 sys.path.insert(1, './Data_collection')
 from get_equivalent_time import get_stereo_time
-
-
-def create_connection(path):
-    connection = None
-    try:
-        connection = sqlite3.connect(path)
-        print("Connection to SQLite DB successful")
-    except Error as e:
-        print(f"The error '{e}' occurred")
-
-    return connection
-
-
-def execute_query(connection, query):
-    cursor = connection.cursor()
-    try:
-        cursor.execute(query)
-        connection.commit()
-        print("Query executed successfully")
-    except Error as e:
-        print(f"The error '{e}' occurred")
-
-
-def execute_read_query(connection, query):
-    cursor = connection.cursor()
-    result = None
-    try:
-        cursor.execute(query)
-        result = cursor.fetchall()
-        return result
-    except Error as e:
-        print(f"The error '{e}' occurred")
-
 
 def get_entry(mode, date):
     """ 
     returns (fits_path, np_path, date)
     if mode is 'phase_map', otherwise returns
     (fits_path, np_path, np_path_normal, date)
-
     """
     fits_path = f"Data/fits_{mode}/{mode.upper()}_{date}.fits"
     if not os.path.exists(fits_path):
