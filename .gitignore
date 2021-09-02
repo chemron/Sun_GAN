@@ -3,3 +3,4 @@ Data_env/
 */__pycache__/*
 */*.png
 image.db
+Models/

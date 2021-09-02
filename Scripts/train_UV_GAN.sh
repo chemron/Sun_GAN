@@ -24,3 +24,13 @@
 module load anaconda/5.1.0-Python3.6-gcc5
 module load cudnn/7.6.5-cuda10.1
 module load tensorflow/2.3.0
+
+python Training/train.py \
+    --model_name "P100_UV_GAN_1" \
+    --display_iter 5 \
+    --max_iter 20 \
+    --batch_size 1 \
+    --tol $((5*24)) \
+    --input "aia.np_path_normal" \
+    --output "hmi.np_path_normal" \
+    --connector "aia.id" "hmi.aia_id" \
