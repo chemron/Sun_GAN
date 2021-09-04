@@ -48,10 +48,15 @@ This can be done by running the data processing pipeline file as follows:
 `sbatch ./Scripts/data_normalisation.sh` (Monarch).  
 
 ## Pipeline: UV-GAN
-The pipeline for generating magnetograms from EUV 304 Angstrom full-disk solar images.
+The pipeline for generating magnetograms from EUV 304 Angstrom full-disk solar
+images.
+1. Train model on SDO AIA EUV images and SDO HMI magnetograms:  
+   `./Scripts/train_UV_GAN.sh` or   
+   `sbatch ./Scripts/train_UV_GAN.sh` (Monarch).
+2. Evaluate model by 
 
 ## Plotting:
 - Plot percentiles of the different data types: 
-   `python Plotting/plot_percentiles.py`
+   `python Plotting/plot_percentiles.py`  
 - View a numpy array from file (enter in path to file when prompted): 
-   `python Plotting/view_specific_npy.py`
+   `python Plotting/view_specific_npy.py`  
