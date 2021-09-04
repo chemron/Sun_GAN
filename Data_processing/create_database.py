@@ -101,6 +101,7 @@ CREATE TABLE IF NOT EXISTS phase_map(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     fits_path VARCHAR(255) NOT NULL,
     np_path VARCHAR(255),
+    np_path_normal VARCHAR(255),
     date TEXT NOT NULL,
     euvi_id INTEGER,
     FOREIGN KEY (euvi_id) REFERENCES euvi (id)
