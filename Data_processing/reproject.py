@@ -140,4 +140,4 @@ for phase_map_fits_path, date, id in output:
 
     np.save(new_path, new_smap)
 
-    insert_into_db(connection, phase_map_fits_path, id)
+    insert_into_db(connection, new_path, id)

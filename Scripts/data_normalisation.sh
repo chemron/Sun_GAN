@@ -42,7 +42,7 @@ python Data_processing/normalise_EUV_data.py
 echo "normalising HMI data"
 python Data_processing/normalise_mag_data.py
 
-for Instrument in AIA HMI EUVI phase_map
+for Instrument in AIA HMI EUVI
 do
     echo "Converting ${Instrument} data to numpy arrays"
     python Data_processing/fits_to_np.py \
