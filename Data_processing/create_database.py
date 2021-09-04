@@ -11,7 +11,7 @@ from get_equivalent_time import get_stereo_time
 
 def get_entry(mode, date):
     """ 
-    returns (fits_path, np_path, date)
+    returns (fits_path, date)
     if mode is 'phase_map', otherwise returns
     (fits_path, np_path, np_path_normal, date)
     """
@@ -26,7 +26,7 @@ def get_entry(mode, date):
         np_path = "NULL"
 
     if mode == 'phase_map':
-        return f'("{fits_path}", "{np_path}", "{date}")'
+        return f'("{fits_path}", "{date}")'
     
     np_path_normal = f"Data/np_{mode.upper()}_normalised/{mode}_{date}.npy"
     if not os.path.exists(np_path_normal):
@@ -101,7 +101,6 @@ CREATE TABLE IF NOT EXISTS phase_map(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     fits_path VARCHAR(255) NOT NULL,
     np_path VARCHAR(255),
-    projected_path VARCHAR(255),
     date TEXT NOT NULL,
     euvi_id INTEGER,
     FOREIGN KEY (euvi_id) REFERENCES euvi (id)
@@ -117,7 +116,7 @@ for mode in ("AIA", "HMI", "EUVI", "phase_map"):
         insert_data += \
         f"""
         INSERT INTO
-            {mode} (fits_path, np_path, date)
+            {mode} (fits_path, date)
         VALUES"""
     else:
         insert_data += \

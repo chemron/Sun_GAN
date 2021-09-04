@@ -7,16 +7,8 @@ from datetime import datetime
 from astropy.coordinates import SkyCoord
 import argparse
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--data",
-                    help="name of data",
-                    default='AIA'
-                    )
-args = parser.parse_args()
 
-mode = args.data
-fits_dir = f"Data/fits_{mode}/"
-np_dir = f"Data/np_{mode}/"
+np_dir = f"Data/np_phase_map/"
 os.makedirs(np_dir) if not os.path.exists(np_dir) else None
 already_done = os.listdir(np_dir)
 files = np.sort(os.listdir(fits_dir))

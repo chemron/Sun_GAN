@@ -83,7 +83,7 @@ def insert_into_db(connection, path, id):
     UPDATE
         phase_map
     SET
-        projected_path = "{path}"
+        np_path = "{path}"
     WHERE
         id = {id}
     """
@@ -111,7 +111,7 @@ B_0 = 0 # helographic latitude
 Phi_0 = 0
 
 # directory for reprojected phase maps:
-output_dir = "Data/np_phase_map_projected/"
+output_dir = "Data/np_phase_map/"
 os.makedirs(output_dir) if not os.path.exists(output_dir) else None
 
 for phase_map_fits_path, date, id in output:
