@@ -31,6 +31,6 @@ python Training/train.py \
     --max_iter 20 \
     --batch_size 1 \
     --tol 3 \
-    --input "aia.np_path_normal" \
-    --output "hmi.np_path_normal" \
-    --connector "aia.id" "hmi.aia_id" \
+    --input "aia.np_path_normal" \  # sql data name (table.column)
+    --output "hmi.np_path_normal" \  # sql data name (table.column)
+    --connector "aia.id" "hmi.aia_id" \  # the connection between the input and output

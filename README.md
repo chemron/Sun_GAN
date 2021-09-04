@@ -52,8 +52,12 @@ The pipeline for generating magnetograms from EUV 304 Angstrom full-disk solar
 images.
 1. Train model on SDO AIA EUV images and SDO HMI magnetograms:  
    `./Scripts/train_UV_GAN.sh` or   
-   `sbatch ./Scripts/train_UV_GAN.sh` (Monarch).
-2. Evaluate model by 
+   `sbatch ./Scripts/train_UV_GAN.sh` (Monarch). See `train_UV_GAN.sh` for
+   additional settings such as # itterations, model name etc.
+2. Evaluate model by testing model on AIA or EUVI data
+   `./Scripts/test_UV_GAN.sh` or   
+   `sbatch ./Scripts/test_UV_GAN.sh` (Monarch). See `test_UV_GAN.sh` for
+   additional settings such as # itterations, model name etc.
 
 ## Plotting:
 - Plot percentiles of the different data types: 

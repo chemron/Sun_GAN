@@ -27,8 +27,8 @@ module load tensorflow/2.3.0
 
 python Training/test.py \
     --model_name 'UV_GAN_1' \
-    --input_data 'aia.np_path_normal' \
-    --test_on_all \
+    --input_data 'aia.np_path_normal' \  # sql data name (table.column)
+    --test_on_all \  # either test on all the input data, or just the test data (i.e data from october or november)
     --display_iter 5 \
     --start_iter 0 \
     --max_iter 20
