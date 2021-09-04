@@ -122,12 +122,9 @@ MAX_LAYERS = 3
 
 TRIAL_NAME = args.model_name
 
-MODE = f"{sql_tables[0]}_to_{sql_tables[1]}"
-
 # make a folder for the trial if it doesn't already exist
-MODEL_PATH_MAIN = './Models/' + TRIAL_NAME + '/'
-# os.mkdir(MODEL_PATH_MAIN) if not os.path.exists(MODEL_PATH_MAIN) else None
-MODEL_PATH = MODEL_PATH_MAIN + MODE + '/'
+MODEL_PATH = './Models/' + TRIAL_NAME + '/'
+
 os.makedirs(MODEL_PATH) if not os.path.exists(MODEL_PATH) else None
 
 
@@ -381,10 +378,10 @@ def READ_IMAGE(FN, NC_IN, NC_OUT):
     X, Y = np.random.randint(31), np.random.randint(31)
     if NC_IN != 1:
         IMG_A = np.pad(IMG_A, ((15, 15), (15, 15), (0, 0)), 'constant')
-        IMG_A = IMG_A[X:X + 1024, Y:Y + 1024, :]  # * 2 - 1
+        IMG_A = IMG_A[X:X + 1024, Y:Y + 1024, :] * 2 - 1
     else:
         IMG_A = np.pad(IMG_A, 15, 'constant')
-        IMG_A = IMG_A[X:X + 1024, Y:Y + 1024]  # * 2 - 1
+        IMG_A = IMG_A[X:X + 1024, Y:Y + 1024] * 2 - 1
 
     if NC_OUT != 1:
         IMG_B = np.pad(IMG_B, ((15, 15), (15, 15), (0, 0)), 'constant')
@@ -500,7 +497,7 @@ while GEN_ITERS <= NITERS:
 
     GEN_ITERS += 1
 
-    f = open(MODEL_PATH_MAIN + "iter_loss.txt", "a+")
+    f = open(MODEL_PATH + "iter_loss.txt", "a+")
     update_str = (
         f"[ {EPOCH:0>3d} ][ {GEN_ITERS:0>6d} / {NITERS} ] LOSS_D: "
         f"{ERR_D:0>5.3f} LOSS_G: {ERR_G:0>5.3f} LOSS_L: {ERR_L:0>5.3f}\n"
@@ -522,7 +519,7 @@ while GEN_ITERS <= NITERS:
         ERR_L_SUM = 0
         ERR_G_SUM = 0
         ERR_D_SUM = 0
-        DST_MODEL = MODEL_PATH+MODE+'_ITER'+'%07d' % GEN_ITERS+'.h5'
+        DST_MODEL = MODEL_PATH+'ITER'+'%07d' % GEN_ITERS+'.h5'
         NET_G.save(DST_MODEL)
         T1 = time.time()
 
