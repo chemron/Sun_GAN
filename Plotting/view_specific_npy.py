@@ -1,7 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 plt.switch_backend("agg")
 
+os.makedirs("Plots/") if not os.exists("Plots/") else None
 filename = input("File path: ")
 name = filename.split("/")[-1]
 arr = np.load(filename)
