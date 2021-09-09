@@ -16,9 +16,7 @@ clip_max = np.max([abs_max, -abs_min])
 
 np_dir = f"Data/np_HMI/"
 normal_np_dir = f"Data/np_HMI_normalised/"
-if os.path.exists(normal_np_dir):
-    raise NameError(f"Path: \"{normal_np_dir}\" already exists")
-else:
+if not os.path.exists(normal_np_dir):
     os.makedirs(normal_np_dir)
 
 data = np.sort(os.listdir(np_dir))
