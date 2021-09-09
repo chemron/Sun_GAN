@@ -15,12 +15,15 @@ plt.switch_backend('agg')
 q = [0, 0.01, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 99.99, 100]
 
 # use n point moving averag to normalise
-n=50
+n=3
 
 def moving_average(a, n):
     ret = np.cumsum(a, dtype=float)
     ret[n:] = ret[n:] - ret[:-n]
-    return ret[n - 1:] / n
+    a[n//2-1:-n//2] = ret[n - 1:] / n
+    a[:n//2-1] = a[n//2-1]
+    a[-n//2:] = a[-n//2 - 1]
+    return a
 
 def remove_outliers(mode):
     # directory of input data
@@ -68,7 +71,7 @@ def get_AIA_min_p(outlier_indicies, min_p_file, n):
     data = np.delete(data, outlier_indicies)
 
     minp = []
-    for i in range(len(data) - 1):
+    for i in range(len(data)):
         name = data[i]
         filename = np_dir + name
         img = np.load(filename).flatten()
@@ -129,8 +132,6 @@ def normalise_EUVI_p(zero_point, percentiles, datetime_dates):
 
     # rolling average of 75th percentile
     rolling_75p = moving_average(percentiles[8], n)
-    percentiles = percentiles.T[n//2-1:-n//2].T
-    datetime_dates = datetime_dates[n//2-1:-n//2]
 
     # Divide by 75th percentile to account for decreasing saturation
     normal_percentiles = percentiles/rolling_75p
@@ -149,7 +150,6 @@ def normalise_data(mode, rolling_75p, clip_max, outlier_indicies, zero_point):
 
     data = np.sort(os.listdir(np_dir))
     data = np.delete(data, outlier_indicies)
-    data = data[n//2-1:-n//2]
     print(len(data))
     print(len(rolling_75p))
     assert len(rolling_75p) == len(data)
