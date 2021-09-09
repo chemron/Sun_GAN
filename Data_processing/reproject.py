@@ -11,6 +11,7 @@ import sqlite3
 from sqlite3 import Error
 from sql_util import create_connection, execute_query, execute_read_query
 
+q = [0, 0.01, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 99.99, 100]
 
 def get_stereo_header(filename):
     hdul = fits.open(filename, memmap=False, ext=0)
@@ -110,6 +111,10 @@ r_sun = stereo_header["RSUN"]
 B_0 = 0 # helographic latitude
 Phi_0 = 0
 
+# percentiles
+percentiles_lst = []
+date_lst = []
+
 # directory for reprojected phase maps:
 output_dir = "Data/np_phase_map/"
 os.makedirs(output_dir) if not os.path.exists(output_dir) else None
@@ -139,5 +144,18 @@ for phase_map_fits_path, date, id in output:
     new_path = f"{output_dir}PHASE_MAP_{date}.npy"
 
     np.save(new_path, new_smap)
-
     insert_into_db(connection, new_path, id)
+    # get percentiles
+    percentiles = np.percentile(new_smap, q)
+    if percentiles is not None:
+        percentiles_lst.append(percentiles)
+        date_lst.append(date)
+
+
+# save percentiles/dates
+percentile_dir = "Data/np_objects/"
+os.makedirs(percentile_dir) if not os.path.exists(percentile_dir) else None
+dates = [datetime.strptime(date, "%Y.%m.%d_%H:%M:%S")
+                    for date in date_lst]
+np.save(f"{percentile_dir}phase_map_percentiles", percentiles_lst)
+np.save(f"{percentile_dir}phase_map_dates", dates)
