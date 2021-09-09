@@ -146,7 +146,7 @@ for phase_map_fits_path, date, id in output:
     np.save(new_path, new_smap)
     insert_into_db(connection, new_path, id)
     # get percentiles
-    percentiles = np.percentile(new_smap, q)
+    percentiles = np.nanpercentile(new_smap, q)
     if percentiles is not None:
         percentiles_lst.append(percentiles)
         date_lst.append(date)
