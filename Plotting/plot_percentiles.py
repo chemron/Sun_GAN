@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 
-modes = ["AIA", "AIA_normal", "EUVI", "EUVI_normal", "HMI", "HMI_normal", "phase_map"]
+modes = ["AIA", "AIA_normal", "EUVI", "EUVI_normal", "HMI", "HMI_normal", "phase_map", "phase_map_normal"]
 
 q = [0, 0.01, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 99.99, 100]
 
