@@ -2,6 +2,8 @@ import os
 from datetime import datetime
 import numpy as np
 import cv2
+from sql_util import create_connection, execute_query, execute_read_query
+
 
 q = [0, 0.01, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 99.99, 100]
 percentiles = np.load(f"Data/np_objects/phase_map_percentiles.npy").T
@@ -17,37 +19,54 @@ clip_max = np.max([abs_max, -abs_min])
 # to get data between -0.5 and 0.5, and centered about 0
 noramlisation_factor = 1.0/(clip_max * 2)
 
-np_dir = f"Data/np_phase_map/"
-normal_np_dir = f"Data/np_phase_map_normalised/"
-if not os.path.exists(normal_np_dir):
-    os.makedirs(normal_np_dir)
+def insert_into_db(connection, path, id):
+    insert_path = f"""
+    UPDATE
+        phase_map
+    SET
+        np_path_normal = "{path}"
+    WHERE
+        id = {id}
+    """
+    execute_query(connection, insert_path)
 
-data = np.sort(os.listdir(np_dir))
+get_phase_map_paths = """
+SELECT
+    np_path,
+    date,
+    id
+FROM
+    phase_map
+"""
+
+connection = create_connection("./image.db")
+output = execute_read_query(connection, get_phase_map_paths)
+
+output_dir = "Data/np_phase_map_normalised/"
 
 # normal percentiles and corresponding dates
 normal_p = []
 normal_d = []
 
 
-for i, (name, date, p) in enumerate(zip(data, dates, percentiles)):
-    save_name = f'phase_map_{date.year}.{date.month:0>2}.{date.day:0>2}_' \
-                f'{date.hour:0>2}:{date.minute:0>2}:{date.second:0>2}'
-    filename = np_dir + name
-    img = np.load(filename)
+for phase_map_np_path, date, id in output:
+    img = np.load(phase_map_np_path)
 
     img = img * noramlisation_factor
     img += 0.5
     try:
         img = cv2.resize(img, dsize=(w, h))
-        np.save(normal_np_dir + name, img)
+        save_name = f"{output_dir}PHASE_MAP_{date}"
+        np.save(save_name, img)
+        insert_into_db(connection, save_name, id)
         percentiles = np.nanpercentile(img, q)
         if percentiles is not None:
             normal_p.append(percentiles)
-            normal_d.append(date)
+            normal_d.append(datetime.strptime(date, "%Y.%m.%d_%H:%M:%S"))
     except cv2.error as e:
-        print(f"{name}: {e}")
+        print(f"{date}: {e}")
     except IndexError as e:
-        print(f"{name}: {e}")
+        print(f"{date}: {e}")
 
 
 percentile_dir = "Data/np_objects/"

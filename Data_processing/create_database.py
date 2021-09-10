@@ -24,9 +24,6 @@ def get_entry(mode, date):
     if not os.path.exists(np_path):
         print(f"path: {np_path} does not exist")
         np_path = "NULL"
-
-    if mode == 'phase_map':
-        return f'("{fits_path}", "{date}")'
     
     np_path_normal = f"Data/np_{mode.upper()}_normalised/{mode}_{date}.npy"
     if not os.path.exists(np_path_normal):
@@ -112,19 +109,10 @@ execute_query(connection, create_phase_map_table)
 
 # insert data into database
 for mode in ("AIA", "HMI", "EUVI", "phase_map"):
-    insert_data = ""
-    if mode == "phase_map":
-        insert_data += \
-        f"""
-        INSERT INTO
-            {mode} (fits_path, date)
-        VALUES"""
-    else:
-        insert_data += \
-        f"""
-        INSERT INTO
-            {mode} (fits_path, np_path, np_path_normal, date)
-        VALUES"""
+    insert_data = f"""
+    INSERT INTO
+        {mode} (fits_path, np_path, np_path_normal, date)
+    VALUES"""
     
     dates = np.load(f"Data/np_objects/{mode}_dates.npy", allow_pickle=True)
     date_strings = [date.strftime("%Y.%m.%d_%H:%M:%S") for date in dates]
@@ -132,7 +120,7 @@ for mode in ("AIA", "HMI", "EUVI", "phase_map"):
         insert_data += \
         f"""
             {get_entry(mode, date)},"""
-    insert_data = insert_data[:-1] + ";\n"
+    insert_data = f"{insert_data[:-1]};\n"
     execute_query(connection, insert_data)
 
 

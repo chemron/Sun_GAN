@@ -35,12 +35,6 @@ conda config --add pkgs_dirs /home/csmi0005/Mona0028/csmi0005/conda/pkgs
 # activate conda environment
 conda activate ./Data_env
 
-echo "normalising EUV data"
-python Data_processing/normalise_EUV_data.py
-
-
-echo "normalising HMI data"
-python Data_processing/normalise_mag_data.py
 
 for Instrument in AIA HMI EUVI
 do
@@ -49,8 +43,17 @@ do
             --data $Instrument
 done
 
+echo "normalising EUV data"
+python Data_processing/normalise_EUV_data.py
+
+echo "normalising HMI data"
+python Data_processing/normalise_mag_data.py
+
 echo "creating database"
 python Data_processing/create_database.py
 
 echo "Re-projecting seismic maps"
 python Data_processing/reproject.py
+
+echo "normalising seismic data"
+python Data_processing/normalise_seismic_data.py
