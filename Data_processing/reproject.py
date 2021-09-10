@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import glob
 import sqlite3
 from sqlite3 import Error
-from sql_util import create_connection, execute_query, execute_read_query
 
 q = [0, 0.01, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 99.99, 100]
 
@@ -79,28 +78,11 @@ def transformation(coord, r_sun=1200, D_0=200, R_0=1, B_0=0,  Phi_0=0, L_0=0):
     return np.stack((col, row), axis=-1)
 
 
-def insert_into_db(connection, path, id):
-    insert_path = f"""
-    UPDATE
-        phase_map
-    SET
-        np_path = "{path}"
-    WHERE
-        id = {id}
-    """
-    execute_query(connection, insert_path)
+def get_date_str(filename):
+    s = filename.split("_")
+    date_str = f"{s[-2]}_{s[-1][:8]}"
+    return date_str
 
-get_phase_map_paths = """
-SELECT
-    fits_path,
-    date,
-    id
-FROM
-    phase_map
-"""
-
-connection = create_connection("./image.db")
-output = execute_read_query(connection, get_phase_map_paths)
 
 # get stereo header for reference
 stereo_fits_path = "Data/fits_EUVI/"
@@ -119,8 +101,13 @@ date_lst = []
 output_dir = "Data/np_phase_map/"
 os.makedirs(output_dir) if not os.path.exists(output_dir) else None
 
-for phase_map_fits_path, date, id in output:
-    hdul = fits.open(phase_map_fits_path, memmap=False, ext=0)
+input_dir = "Data/fits_phase_map/"
+fits_paths = np.sort(os.listdir(input_dir))
+
+for file in fits_paths:
+    full_path = input_dir + file
+    date = get_date_str(file)
+    hdul = fits.open(full_path, memmap=False, ext=0)
     hdul.verify("fix")
     smap_data = hdul[0].data
     smap_header = hdul[0].header
@@ -144,7 +131,6 @@ for phase_map_fits_path, date, id in output:
     new_path = f"{output_dir}PHASE_MAP_{date}.npy"
 
     np.save(new_path, new_smap)
-    insert_into_db(connection, new_path, id)
     # get percentiles
     percentiles = np.nanpercentile(new_smap, q)
     if percentiles is not None:

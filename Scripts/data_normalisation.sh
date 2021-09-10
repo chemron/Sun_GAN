@@ -43,6 +43,9 @@ do
             --data $Instrument
 done
 
+echo "Re-projecting seismic maps"
+python Data_processing/reproject.py
+
 echo "normalising EUV data"
 python Data_processing/normalise_EUV_data.py
 
@@ -51,9 +54,6 @@ python Data_processing/normalise_mag_data.py
 
 echo "creating database"
 python Data_processing/create_database.py
-
-echo "Re-projecting seismic maps"
-python Data_processing/reproject.py
 
 echo "normalising seismic data"
 python Data_processing/normalise_seismic_data.py
