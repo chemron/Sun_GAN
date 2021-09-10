@@ -1,6 +1,7 @@
 # Sun_GAN
-See [my honours thesis](https://github.com/chemron/honours_thesis/blob/master/thesis.pdf) for a full description of the system. 
-
+See 
+[my honours thesis](https://github.com/chemron/honours_thesis/blob/master/thesis.pdf)
+for a full description of the system. 
 
 ## Environments
 ### Data processing
@@ -23,6 +24,11 @@ following commands:
 `module load cudnn/7.6.5-cuda10.1`  
 `module load tensorflow/2.3.0`  
 
+These can similarly be unloaded by using the commands:
+`module unload anaconda/5.1.0-Python3.6-gcc5`  
+`module unload cudnn/7.6.5-cuda10.1`  
+`module unload tensorflow/2.3.0`  
+
 ## Pipeline: Data Preparation
 The pipeline for downloading and preparing the data used throughout this project.
 ### Data collection
@@ -33,17 +39,20 @@ The STEREO data is downloaded such that it is synchronised with the phase maps.
 
 ### Data processing
 The processing pipleine consists of
-1. Converting fits data into local numpy arrays (.npy), and getting percentiles of the
-   data
-2. Normalising the data SDO and STEREO (remove outliers, change saturation and
-   make EUV data consistant - see
-   [thesis](https://github.com/chemron/honours_thesis/blob/master/thesis.pdf))
-3. Creating a database (`image.db`) that maps the connections between the different
-   data types
-4. Reprojecting the seismic maps (phase maps) from a Carrington Heliographic
-   projection to a Helioprojective-cartesian projection.
+1. Converting SDO and STEREO fits data into local numpy arrays (.npy), and get
+   percentiles of the data
+2. Reproject the seismic maps (phase maps) from a Carrington Heliographic
+   projection to a Helioprojective-cartesian projection, convert to numpy arrays
+   and get percentiles.
+3. Remove outliers in each dataset
+4. change saturation for EUV and magnetogram data
+5. normalise data (put data between -1 and 1 for magnetograms, and between 0 and
+   1 for the other datasets)
+6. Remove trends in EUV data caused by instrument degredation
+7. Create a database (`image.db`) that maps the connections between the different
+   data types  
 
-This can be done by running the data processing pipeline file as follows:  
+The data processing pipeline can be run as follows:
 `./Scripts/data_normalisation.sh` or   
 `sbatch ./Scripts/data_normalisation.sh` (Monarch).  
 
