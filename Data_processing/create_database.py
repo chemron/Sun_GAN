@@ -25,7 +25,7 @@ def get_entry(mode, date):
         print(f"path: {np_path} does not exist")
         np_path = "NULL"
     
-    np_path_normal = f"Data/np_{mode.upper()}_normalised/{mode}_{date}.npy"
+    np_path_normal = f"Data/np_{mode}_normalised/{mode.upper()}_{date}.npy"
     if not os.path.exists(np_path_normal):
         print(f"path: {np_path_normal} does not exist")
         np_path_normal = "NULL"

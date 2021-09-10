@@ -52,8 +52,8 @@ python Data_processing/normalise_EUV_data.py
 echo "normalising HMI data"
 python Data_processing/normalise_mag_data.py
 
-echo "creating database"
-python Data_processing/create_database.py
-
 echo "normalising seismic data"
 python Data_processing/normalise_seismic_data.py
+
+echo "creating database"
+python Data_processing/create_database.py
