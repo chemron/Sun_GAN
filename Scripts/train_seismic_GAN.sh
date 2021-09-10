@@ -26,14 +26,16 @@ module load cudnn/7.6.5-cuda10.1
 module load tensorflow/2.3.0
 
 python Training/train.py \
-    --model_name "UV_GAN_1" \
+    --model_name "Seismic_GAN_1" \
     --display_iter 5 \
     --max_iter 20 \
     --batch_size 1 \
-    --tol 3 \
-    --input "aia.np_path_normal" \
-    --output "hmi.np_path_normal" \
-    --connector "aia.id" "hmi.aia_id" \
+    --tol $((9*24)) \
+    --input "phase_map.np_path_normal" \
+    --output "euvi.UV_GAN_1_iter_0000020_path" \
+    --connector "phase_map.id" "euvi.phase_map_id" \
 # input: sql data name (table.column)
 # output: sql data name (table.column)
 # connector: the connection between the input and output
+# tol: the time difference between input and output data in hours (must be large
+# for seismic gan, as most euvi data is not directly from farside - see thesis)

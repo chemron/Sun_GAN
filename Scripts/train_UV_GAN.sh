@@ -37,3 +37,4 @@ python Training/train.py \
 # input: sql data name (table.column)
 # output: sql data name (table.column)
 # connector: the connection between the input and output
+# tol: the time difference between input and output data in hours

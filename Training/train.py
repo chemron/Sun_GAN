@@ -410,8 +410,8 @@ def MINI_BATCH(DATA_AB, BATCH_SIZE, NC_IN, NC_OUT):
         DATA_A = []
         DATA_B = []
         # make batches of length: SIZE
-        for J in range(i, i + SIZE):
-            IMG_A, IMG_B = READ_IMAGE(DATA_AB[J], NC_IN, NC_OUT)
+        for j in range(i, i + SIZE):
+            IMG_A, IMG_B = READ_IMAGE(DATA_AB[j], NC_IN, NC_OUT)
             DATA_A.append(IMG_A)
             DATA_B.append(IMG_B)
         DATA_A = np.float32(DATA_A)
@@ -457,10 +457,13 @@ WHERE
 GROUP BY
     {sql_connector[0]}
 """
-
 data_paths = execute_read_query(connection, get_data)
 
 LIST_TOTAL = list(GRAB_DATA(data_paths))
+
+n = len(LIST_TOTAL)
+assert n>0, "No Images satisfy constraints (check --tol)"
+
 print(f"Training on {len(LIST_TOTAL)} images.")
 
 shuffle(LIST_TOTAL)

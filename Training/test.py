@@ -182,7 +182,7 @@ while ITER <= MAX_ITER:
             UPDATE
                 {sql_table}
             SET
-                {model_name}_iter_{SITER}_path = "{save_name}"
+                {model_name}_iter_{SITER}_path = "{save_name}.npy"
             WHERE
                 date = "{date}"
             """
