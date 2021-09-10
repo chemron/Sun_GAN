@@ -431,7 +431,11 @@ def GRAB_DATA(data_paths):
         output_path = output_paths[i]
         output_date = get_datetime(output_dates[i])
 
+        # accidentally inserted the string "NULL" into db, so this is to catch that
         if "NULL" in (input_path, output_path):
+            continue
+
+        if None in (input_path, output_path):
             continue
         
         if abs(input_date - output_date) > tol:
