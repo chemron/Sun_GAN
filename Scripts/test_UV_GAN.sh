@@ -41,5 +41,13 @@ python Training/test.py \
     --start_iter 0 \
     --max_iter 20
 
+
 # input data: sql data name (table.column)
-# test on all: either test on all the input data, or just the test data (i.e data from october or november)
+# test on all: either test on all the input data, or just the test data (i.e
+# data from october or november)
+
+# apply mask to outputs
+python Data_processing/apply_mask.py \
+    --data "euvi.UV_GAN_1_iter_0000020_path"
+
+# data: data to apply mask to ([sql table].[column])
