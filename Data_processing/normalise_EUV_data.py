@@ -16,6 +16,7 @@ q = [0, 0.01, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 99.99, 100]
 
 # use n point moving averag to normalise
 n=3
+size = 1024
 
 def moving_average(a, n):
     ret = np.cumsum(a, dtype=float)
@@ -172,13 +173,16 @@ def normalise_data(mode, rolling_75p, clip_max, outlier_indicies, zero_point):
         filename = np_dir + name
         img = np.load(filename)
         img -= zero_point
-        img = img/divider
-        img = img.clip(0, 1)
-
         # square root data to increase saturation (see thesis)
+        img = img/divider
         img = (np.abs(img) ** (1/2))
+
+        img = img * 2 - 1
+        img = img.clip(-1, 1)
+
         try:
             img = cv2.resize(img, dsize=(w, h))
+            img *= mask
             np.save(normal_np_dir + save_name, img)
         except cv2.error as e:
             print(f"{name}: {e}")
@@ -197,7 +201,17 @@ def normalise_data(mode, rolling_75p, clip_max, outlier_indicies, zero_point):
 
     np.save(f"{percentile_dir}{mode}_normal_percentiles", normal_p)
     np.save(f"{percentile_dir}{mode}_normal_dates", normal_d)
-            
+
+
+def get_mask(size):
+    w = h = size
+    center = (int(w/2), int(h/2))
+    radius = w/2 + 1
+    Y, X = np.ogrid[:h, :w]
+    dist_from_center = np.sqrt((X - center[0])**2 + (Y-center[1])**2)
+    mask = dist_from_center <= radius
+    return mask
+
 
 if __name__ == '__main__':
     # AIA data:
@@ -220,6 +234,7 @@ if __name__ == '__main__':
     EUVI_rolling_75p, clip_max = normalise_EUVI_p(zero_point, EUVI_p, EUVI_dates)
     AIA_rolling_75p = moving_average(AIA_p[8], n)
 
+    mask = get_mask(size)
     # normalise AIA data
     normalise_data("AIA", AIA_rolling_75p, clip_max, AIA_outlier_i, 0)
 
