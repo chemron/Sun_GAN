@@ -4,3 +4,4 @@ Data_env/
 */*.png
 image.db
 Models/
+test.sh
