@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # Python code for retrieving SDO-HMI/AIA data
-from email.mime import base
 from sunpy.net import Fido, attrs as a
 import numpy as np
 
@@ -212,11 +211,16 @@ def get_STEREO_data(instrument: str, start: str, end: str,
         all_times = np.array(all_times)
 
 
-        # times which to download STEREO data
-        download_times = get_closest_time_STEREO(all_times, stereo_times)
+        # indices which to download STEREO data
+        indices, times = get_closest_index_STEREO(all_times, stereo_times)
 
+        # all file ids
+        ids = table["fileid"]
+
+        # urls to download
+        base_url = "https://stereo-ssc.nascom.nasa.gov/data/ins_data/"
+        urls = [base_url + ids[i] for i in indices]
         
-        urls, times = get_STEREO_urls(download_times)
         print(list(zip(urls, times)))
 
         download_data(urls, path, times, instrument)
@@ -225,43 +229,6 @@ def get_STEREO_data(instrument: str, start: str, end: str,
         if s_time == f_time:
             break
         e_time = s_time + step_time
-
-
-def get_STEREO_urls(download_times):
-    """ get the urls of the stereo images corresponding to the times in download_times"""
-
-    base_url = "https://stereo-ssc.nascom.nasa.gov/data/ins_data/secchi/L0/a/img/euvi/"
-    url = ""
-    fits_files = []
-    urls = []
-    times = []
-    soup = None
-    for time in download_times:
-        date_string = f"{time.year}{time.month:0>2}{time.day:0>2}"
-        new_url = f"{base_url}{date_string}/"
-        if new_url != url:
-            try:
-                web_page = requests.get(new_url)
-            except Exception as e:
-                print(f"Got exception: '{e}' when requesting url: '{new_url}'")
-                continue
-            soup = BeautifulSoup(web_page.text, 'html.parser')
-            fits_files = [node.get('href') for node in soup.find_all('a') if node.get('href').endswith('fts')]
-
-        file_sub_string = f"{date_string}_{time.hour:0>2}{time.minute:0>2}"
-        file_index = np.searchsorted(fits_files, file_sub_string)
-        file = fits_files[file_index]
-        full_url = new_url + file
-
-        urls.append(full_url)
-        times.append(time)
-        url = new_url
-    
-    return urls, times
-# ps://stereo-ssc.nascom.nasa.gov/data/ins_data/secchi/L0/a/img/euvi/20200111//20200111_000530_n4euA.fts
-
-
-
 
 
         
@@ -293,7 +260,7 @@ def get_index_SDO(times, start: datetime, end: datetime, cadence: timedelta):
     return index, dates
 
 
-def get_closest_time_STEREO(all_times, stereo_times):
+def get_closest_index_STEREO(all_times, stereo_times):
     # tolerance for closest time
     tol = timedelta(hours=1)
 
@@ -324,9 +291,9 @@ def get_closest_time_STEREO(all_times, stereo_times):
     
     closest_i = closest_i[difference < tol]
 
-    closest = all_times[closest_i]
+    closest_time = all_times[closest_i]
 
-    return closest
+    return closest_i, closest_time
 
 
 
