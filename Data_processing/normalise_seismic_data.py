@@ -15,7 +15,7 @@ print(f"Absolute max: {abs_max}, Absolute min: {abs_min}")
 
 clip_max = np.max([abs_max, -abs_min])
 # to get data between -0.5 and 0.5, and centered about 0
-noramlisation_factor = 1.0/(clip_max * 2)
+noramlisation_factor = 1.0/(clip_max)
 
 np_dir = f"Data/np_phase_map/"
 normal_np_dir = f"Data/np_phase_map_normalised/"
@@ -28,6 +28,16 @@ data = np.sort(os.listdir(np_dir))
 normal_p = []
 normal_d = []
 
+def get_mask(size):
+    w = h = size
+    center = (int(w/2), int(h/2))
+    radius = w/2 + 1
+    Y, X = np.ogrid[:h, :w]
+    dist_from_center = np.sqrt((X - center[0])**2 + (Y-center[1])**2)
+    mask = dist_from_center <= radius
+    return mask
+
+mask = get_mask(w)
 
 for i, (name, date, p) in enumerate(zip(data, dates, percentiles)):
     save_name = f'phase_map_{date.year}.{date.month:0>2}.{date.day:0>2}_' \
@@ -36,11 +46,12 @@ for i, (name, date, p) in enumerate(zip(data, dates, percentiles)):
     img = np.load(filename)
 
     img = img * noramlisation_factor
-    img += 0.5
     try:
         img = cv2.resize(img, dsize=(w, h))
+        img = np.nan_to_num(img)
+        img *= mask
         np.save(normal_np_dir + name, img)
-        percentiles = np.nanpercentile(img, q)
+        percentiles = np.percentile(img, q)
         if percentiles is not None:
             normal_p.append(percentiles)
             normal_d.append(date)
