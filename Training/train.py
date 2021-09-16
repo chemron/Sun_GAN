@@ -378,10 +378,10 @@ def READ_IMAGE(FN, NC_IN, NC_OUT):
     X, Y = np.random.randint(31), np.random.randint(31)
     if NC_IN != 1:
         IMG_A = np.pad(IMG_A, ((15, 15), (15, 15), (0, 0)), 'constant')
-        IMG_A = IMG_A[X:X + 1024, Y:Y + 1024, :] * 2 - 1
+        IMG_A = IMG_A[X:X + 1024, Y:Y + 1024, :]
     else:
         IMG_A = np.pad(IMG_A, 15, 'constant')
-        IMG_A = IMG_A[X:X + 1024, Y:Y + 1024] * 2 - 1
+        IMG_A = IMG_A[X:X + 1024, Y:Y + 1024]
 
     if NC_OUT != 1:
         IMG_B = np.pad(IMG_B, ((15, 15), (15, 15), (0, 0)), 'constant')

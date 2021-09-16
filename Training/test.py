@@ -164,7 +164,7 @@ while ITER <= MAX_ITER:
     
     data_paths = grab_data(input_data_paths)
     for path, date in data_paths:
-        IMG = np.load(path) * 2 - 1
+        IMG = np.load(path)
         save_name = f"{output_folder}MAG_{date}"
 
         # reshapes IMG tensor to (BATCH_SIZE, ISIZE, ISIZE, NC_IN)
