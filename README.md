@@ -53,8 +53,8 @@ The processing pipleine consists of
    data types  
 
 The data processing pipeline can be run as follows:
-`./Scripts/data_normalisation.sh` or   
-`sbatch ./Scripts/data_normalisation.sh` (Monarch).  
+`./Scripts/data_processing.sh` or   
+`sbatch ./Scripts/data_processing.sh` (Monarch).  
 
 ## Pipeline: UV-GAN
 The pipeline for generating magnetograms from EUV 304 Angstrom full-disk solar
