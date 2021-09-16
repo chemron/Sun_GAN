@@ -4,14 +4,14 @@
 
 # Request CPU resource for a serial job
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=6
 # SBATCH --partition=short,comp
 
 # Memory usage (MB)
-#SBATCH --mem=20G
+#SBATCH --mem=30G
 
 # Set your minimum acceptable walltime, format: day-hours:minutes:seconds
-#SBATCH --time=03:00:00
+#SBATCH --time=30:00:00
 
 #SBATCH --mail-user=csmi0005@student.monash.edu
 #SBATCH --mail-type=FAIL
@@ -46,7 +46,7 @@ echo "Getting AIA, HMI, EUVI fits data"
 python Data_collection/get_SDO_STEREO_data.py \
         --instruments 'AIA' 'HMI' 'EUVI' \
         --start '2010-06-01 00:00:00' \
-        --end '2010-06-07 00:00:00' \
+        --end '2020-01-01 00:00:00' \
         --cadence 12 \
         --path  './Data/' \
         --email "camerontasmith@gmail.com"
@@ -55,4 +55,4 @@ echo "Getting farside siesmic fits data"
 # get phase maps (seismic data)
 python Data_collection/get_seismic_data.py \
         --start '2010-06-01 00:00:00' \
-        --end '2010-06-07 00:00:00' \
+        --end '2020-01-01 00:00:00' \
