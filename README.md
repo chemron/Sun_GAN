@@ -57,16 +57,30 @@ The data processing pipeline can be run as follows:
 `sbatch ./Scripts/data_processing.sh` (Monarch).  
 
 ## Pipeline: UV-GAN
-The pipeline for generating magnetograms from EUV 304 Angstrom full-disk solar
-images.
+The pipeline for generating synthetic magnetograms from EUV 304 Angstrom full-disk solar
+images. Trains by comparing SDO EUV images with SDO magnetograms.
 1. Train model on SDO AIA EUV images and SDO HMI magnetograms:  
    `./Scripts/train_UV_GAN.sh` or   
    `sbatch ./Scripts/train_UV_GAN.sh` (Monarch). See `train_UV_GAN.sh` for
    additional settings such as # itterations, model name etc.
-2. Evaluate model by testing model on AIA or EUVI data
+2. Evaluate model by testing model on AIA and EUVI data
    `./Scripts/test_UV_GAN.sh` or   
    `sbatch ./Scripts/test_UV_GAN.sh` (Monarch). See `test_UV_GAN.sh` for
+   additional settings such as # itterations, model name etc. This additionally
+   applies a mask to selected outputs to aid in training the seismic GAN
+
+## Pipeline: Seismic-GAN
+The pipeline for generating synthetic magnetograms from farside seismic maps.
+Trains by comparing farside seismic maps to synthetic magnetograms generated
+from STEREO EUV data.
+1. Train model on seismic maps and synthetic STEREO magnetograms:  
+   `./Scripts/train_seismic_GAN.sh` or   
+   `sbatch ./Scripts/train_seismic_GAN.sh` (Monarch). See `train_seismic_GAN.sh` for
    additional settings such as # itterations, model name etc.
+2. Evaluate model by testing model on seismic maps
+   `./Scripts/test_seismic_GAN.sh` or   
+   `sbatch ./Scripts/test_seismic_GAN.sh` (Monarch). See `test_seismic_GAN.sh` for
+   additional settings such as # itterations, model name, testing set etc.
 
 ## Plotting:
 - Plot percentiles of the different data types: 
