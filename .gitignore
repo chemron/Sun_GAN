@@ -1,7 +1,9 @@
-Data/
+Data/*
 Data_env/
 */__pycache__/*
 */*.png
 image.db
 Models/
 test.sh
+*.out
+!Data/x_flare_list.txt
