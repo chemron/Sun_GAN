@@ -57,8 +57,11 @@ The data processing pipeline can be run as follows:
 `sbatch ./Scripts/data_processing.sh` (Monarch).  
 
 ## Pipeline: UV-GAN
-The pipeline for generating synthetic magnetograms from EUV 304 Angstrom full-disk solar
-images. Trains by comparing SDO EUV images with SDO magnetograms.
+The pipeline for generating synthetic magnetograms from EUV 304 Angstrom
+full-disk solar images. Trains by comparing SDO EUV images with SDO
+magnetograms. It is a good idea to initially run the GAN for a small number of
+itterations (e.g. 20) to ensure everything is working as it should before
+running a full scale model.  
 1. Train model on SDO AIA EUV images and SDO HMI magnetograms:  
    `./Scripts/train_UV_GAN.sh` or   
    `sbatch ./Scripts/train_UV_GAN.sh` (Monarch). See `train_UV_GAN.sh` for
@@ -72,7 +75,9 @@ images. Trains by comparing SDO EUV images with SDO magnetograms.
 ## Pipeline: Seismic-GAN
 The pipeline for generating synthetic magnetograms from farside seismic maps.
 Trains by comparing farside seismic maps to synthetic magnetograms generated
-from STEREO EUV data.
+from STEREO EUV data. It is a good idea to initially run the GAN for a small
+number of itterations (e.g. 20) to ensure everything is working as it should
+before running a full scale model.  
 1. Train model on seismic maps and synthetic STEREO magnetograms:  
    `./Scripts/train_seismic_GAN.sh` or   
    `sbatch ./Scripts/train_seismic_GAN.sh` (Monarch). See `train_seismic_GAN.sh` for
