@@ -4,14 +4,14 @@
 
 # Request CPU resource for a serial job
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=6
 # SBATCH --partition=short,comp
 
 # Memory usage (MB)
 #SBATCH --mem=20G
 
 # Set your minimum acceptable walltime, format: day-hours:minutes:seconds
-#SBATCH --time=03:00:00
+#SBATCH --time=40:00:00
 
 #SBATCH --mail-user=csmi0005@student.monash.edu
 #SBATCH --mail-type=FAIL
