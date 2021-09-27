@@ -4,7 +4,6 @@ import numpy as np
 import cv2
 
 q = [0, 0.01, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 99.99, 100]
-percentiles = np.load(f"Data/np_objects/phase_map_percentiles.npy").T
 dates = np.load(f"Data/np_objects/phase_map_dates.npy", allow_pickle=True)
 w = h = 1024
 
@@ -37,9 +36,10 @@ def get_mask(size):
     mask = dist_from_center <= radius
     return mask
 
+print(len(percentiles))
 mask = get_mask(w)
 
-for i, (name, date, p) in enumerate(zip(data, dates, percentiles)):
+for i, (name, date) in enumerate(zip(data, dates)):
     save_name = f'phase_map_{date.year}.{date.month:0>2}.{date.day:0>2}_' \
                 f'{date.hour:0>2}:{date.minute:0>2}:{date.second:0>2}'
     filename = np_dir + name
@@ -55,6 +55,7 @@ for i, (name, date, p) in enumerate(zip(data, dates, percentiles)):
         if percentiles is not None:
             normal_p.append(percentiles)
             normal_d.append(date)
+        print(name)
     except cv2.error as e:
         print(f"{name}: {e}")
     except IndexError as e:
