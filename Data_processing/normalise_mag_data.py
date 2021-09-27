@@ -44,6 +44,10 @@ normal_d = []
 
 for i in range(len(data)):
     name = data[i]
+    if os.path.exists(f"{normal_np_dir}{name}.npy"):
+         print(name + " already done.")
+         continue
+    print(name)
     date_str = name.split('_')
     date_str = date_str[1] + date_str[2]
     date = datetime.strptime(date_str, '%Y.%m.%d%H:%M:%S.npy')
