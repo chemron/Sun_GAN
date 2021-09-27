@@ -15,7 +15,7 @@ plt.switch_backend('agg')
 q = [0, 0.01, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 99.99, 100]
 
 # use n point moving averag to normalise
-n=3
+n=56
 size = 1024
 
 def moving_average(a, n):
