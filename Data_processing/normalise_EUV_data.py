@@ -146,7 +146,7 @@ def normalise_EUVI_p(zero_point, percentiles):
 
 def get_data(dir, date, mode):
     return f"{mode}_{date.year}.{date.month:0>2}.{date.day:0>2}_" \
-           f"{date.hour:0>2}:{date.minute:0>2}.{date.second:0>2}.npy"
+           f"{date.hour:0>2}:{date.minute:0>2}:{date.second:0>2}.npy"
 
 
 def normalise_data(mode, rolling_75p, clip_max, zero_point, datetime_dates):
