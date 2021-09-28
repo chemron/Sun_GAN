@@ -184,6 +184,8 @@ def normalise_data(mode, rolling_75p, clip_max, zero_point, datetime_dates):
             img = cv2.resize(img, dsize=(w, h))
             img *= mask
             np.save(normal_np_dir + save_name, img)
+            print(save_name)
+
         except cv2.error as e:
             print(f"{name}: {e}")
 
