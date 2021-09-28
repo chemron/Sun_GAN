@@ -1,10 +1,10 @@
 import os
-from datetime import datetime
 import numpy as np
 import cv2
 
 q = [0, 0.01, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 99.99, 100]
-dates = np.load(f"Data/np_objects/phase_map_dates.npy", allow_pickle=True)
+percentiles = np.load("Data/np_objects/phase_map_percentiles.npy").T
+dates = np.load("Data/np_objects/phase_map_dates.npy", allow_pickle=True)
 w = h = 1024
 
 abs_max = abs(np.max(percentiles[-1]))
@@ -16,8 +16,8 @@ clip_max = np.max([abs_max, -abs_min])
 # to get data between -0.5 and 0.5, and centered about 0
 noramlisation_factor = 1.0/(clip_max)
 
-np_dir = f"Data/np_phase_map/"
-normal_np_dir = f"Data/np_phase_map_normalised/"
+np_dir = "Data/np_phase_map/"
+normal_np_dir = "Data/np_phase_map_normalised/"
 if not os.path.exists(normal_np_dir):
     os.makedirs(normal_np_dir)
 
@@ -26,6 +26,7 @@ data = np.sort(os.listdir(np_dir))
 # normal percentiles and corresponding dates
 normal_p = []
 normal_d = []
+
 
 def get_mask(size):
     w = h = size
@@ -36,7 +37,7 @@ def get_mask(size):
     mask = dist_from_center <= radius
     return mask
 
-print(len(percentiles))
+
 mask = get_mask(w)
 
 for i, (name, date) in enumerate(zip(data, dates)):
@@ -55,7 +56,6 @@ for i, (name, date) in enumerate(zip(data, dates)):
         if percentiles is not None:
             normal_p.append(percentiles)
             normal_d.append(date)
-        print(name)
     except cv2.error as e:
         print(f"{name}: {e}")
     except IndexError as e:
