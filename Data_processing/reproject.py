@@ -1,16 +1,11 @@
 import os
 import numpy as np
 from astropy.io import fits
-from bisect import bisect_left
-from datetime import datetime, timedelta
-from shutil import copyfile, rmtree
 from skimage.transform import warp
-import matplotlib.pyplot as plt
-import glob
-import sqlite3
-from sqlite3 import Error
+from datetime import datetime
 
 q = [0, 0.01, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 99.99, 100]
+
 
 def get_stereo_header(filename):
     hdul = fits.open(filename, memmap=False, ext=0)
@@ -86,11 +81,11 @@ def get_date_str(filename):
 
 # get stereo header for reference
 stereo_fits_path = "Data/fits_EUVI/"
-stereo_fits_path += os.listdir(stereo_fits_path)[0] 
+stereo_fits_path += os.listdir(stereo_fits_path)[0]
 stereo_header = get_stereo_header(stereo_fits_path)
 D_0 = stereo_header["DSUN_OBS"] / 696340000  # in terms of radius
 r_sun = stereo_header["RSUN"]
-B_0 = 0 # helographic latitude
+B_0 = 0  # helographic latitude
 Phi_0 = 0
 
 # percentiles
@@ -136,12 +131,14 @@ for file in fits_paths:
     if percentiles is not None:
         percentiles_lst.append(percentiles)
         date_lst.append(date)
+    else:
+        print(date + " percentiles are none")
 
 
 # save percentiles/dates
 percentile_dir = "Data/np_objects/"
 os.makedirs(percentile_dir) if not os.path.exists(percentile_dir) else None
 dates = [datetime.strptime(date, "%Y.%m.%d_%H:%M:%S")
-                    for date in date_lst]
+         for date in date_lst]
 np.save(f"{percentile_dir}phase_map_percentiles", percentiles_lst)
 np.save(f"{percentile_dir}phase_map_dates", dates)

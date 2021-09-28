@@ -3,20 +3,18 @@ from scipy.stats import percentileofscore
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import argparse
-from scipy.stats import percentileofscore
 import cv2
 
 plt.switch_backend('agg')
-
 
 
 # percentiles
 q = [0, 0.01, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 99.99, 100]
 
 # use n point moving averag to normalise
-n=56
+n = 56
 size = 1024
+
 
 def moving_average(a, n):
     ret = np.cumsum(a, dtype=float)
@@ -26,12 +24,13 @@ def moving_average(a, n):
     a[-n//2:] = a[-n//2 - 1]
     return a
 
+
 def remove_outliers(mode):
     # directory of input data
-    np_dir = f"Data/np_{mode}/"
 
     percentiles = np.load(f"Data/np_objects/{mode}_percentiles.npy").T
-    datetime_dates = np.load(f"Data/np_objects/{mode}_dates.npy", allow_pickle=True)
+    datetime_dates = np.load(f"Data/np_objects/{mode}_dates.npy",
+                             allow_pickle=True)
 
     lower_cutoff, upper_cutoff = get_cutoff(mode, datetime_dates)
 
@@ -51,15 +50,15 @@ def get_cutoff(mode, datetime_dates):
     if mode == "AIA":
         upper_cutoff = np.full(len(datetime_dates), np.inf)
         lower_cutoff = np.array([45 if (x < datetime(2014, 1, 1))
-                    else 20 if (x < datetime(2015, 2, 1))
-                    else 8 for x in datetime_dates])
+                                 else 20 if (x < datetime(2015, 2, 1))
+                                 else 8 for x in datetime_dates])
     elif mode == "EUVI":
         upper_cutoff = np.full(len(datetime_dates), 1300)
         lower_cutoff = np.array([1100 if (x < datetime(2014, 5, 1))
-                            else 1070 if (x < datetime(2015, 8, 15))
-                            else 1010 if (x < datetime(2016, 12, 1))
-                            else 980 if (x < datetime(2018, 4, 1))
-                            else 950 for x in datetime_dates])
+                                 else 1070 if (x < datetime(2015, 8, 15))
+                                 else 1010 if (x < datetime(2016, 12, 1))
+                                 else 980 if (x < datetime(2018, 4, 1))
+                                 else 950 for x in datetime_dates])
     else:
         raise ValueError("Mode should be either 'AIA' or 'EUVI'")
     return lower_cutoff, upper_cutoff
@@ -67,7 +66,7 @@ def get_cutoff(mode, datetime_dates):
 
 def get_AIA_min_p(outlier_indicies, min_p_file, n):
     # get percentage of AIA data below 0
-    np_dir = f"Data/np_AIA/"
+    np_dir = "Data/np_AIA/"
     data = np.sort(os.listdir(np_dir))
     data = np.delete(data, outlier_indicies)
 
@@ -105,6 +104,7 @@ def get_EUVI_zeros(min_p_file, EUVI_zeros_file, outlier_indicies):
 
     np.save(EUVI_zeros_file, np.array(EUVI_zeros))
 
+
 # rolling max
 def get_clip_max(lst, k):
     # get the minimum of 50 point rolling max's
@@ -113,6 +113,7 @@ def get_clip_max(lst, k):
         if local_max < clip_max:
             clip_max = local_max
     return clip_max
+
 
 def rolling_list(lst, k):
     n = len(lst)
@@ -124,6 +125,7 @@ def rolling_list(lst, k):
             current_lst = lst[left:right]
 
         yield max(current_lst)
+
 
 def normalise_EUVI_p(zero_point, percentiles, datetime_dates):
     # normalise the percentiles of EUVI data
@@ -138,7 +140,6 @@ def normalise_EUVI_p(zero_point, percentiles, datetime_dates):
     normal_percentiles = percentiles/rolling_75p
 
     clip_max = get_clip_max(normal_percentiles[-1], 50)
-
 
     return rolling_75p, clip_max
 
@@ -157,8 +158,7 @@ def normalise_data(mode, rolling_75p, clip_max, outlier_indicies, zero_point):
 
     # normal percentiles and corresponding dates
     normal_p = []
-    normal_d = []                                                           
-
+    normal_d = []
 
     for i in range(len(data)):
 
@@ -195,7 +195,6 @@ def normalise_data(mode, rolling_75p, clip_max, outlier_indicies, zero_point):
         except IndexError as e:
             print(f"{name}: {e}")
 
-
     percentile_dir = "Data/np_objects/"
     os.makedirs(percentile_dir) if not os.path.exists(percentile_dir) else None
 
@@ -231,7 +230,8 @@ if __name__ == '__main__':
     zero_point = np.average(zero_point)
     zero_point = int(np.round(zero_point))
     # get rolling average of 75th percentile, clip max
-    EUVI_rolling_75p, clip_max = normalise_EUVI_p(zero_point, EUVI_p, EUVI_dates)
+    EUVI_rolling_75p, clip_max = normalise_EUVI_p(zero_point, EUVI_p,
+                                                  EUVI_dates)
     AIA_rolling_75p = moving_average(AIA_p[8], n)
 
     mask = get_mask(size)
@@ -239,4 +239,5 @@ if __name__ == '__main__':
     normalise_data("AIA", AIA_rolling_75p, clip_max, AIA_outlier_i, 0)
 
     # normalise EUVI data
-    normalise_data("EUVI", EUVI_rolling_75p, clip_max, EUVI_outlier_i, zero_point)
+    normalise_data("EUVI", EUVI_rolling_75p, clip_max,
+                   EUVI_outlier_i, zero_point)

@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 
 q = [0, 0.01, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 99.99, 100]
-percentiles = np.load(f"Data/np_objects/HMI_percentiles.npy").T
+percentiles = np.load("Data/np_objects/HMI_percentiles.npy").T
 w = h = 1024
 
 
@@ -28,11 +28,10 @@ print(f"Absolute max: {abs_max}, Absolute min: {abs_min}")
 clip_max = np.max([abs_max, -abs_min])
 
 
-np_dir = f"Data/np_HMI/"
-normal_np_dir = f"Data/np_HMI_normalised/"
+np_dir = "Data/np_HMI/"
+normal_np_dir = "Data/np_HMI_normalised/"
 if not os.path.exists(normal_np_dir):
     os.makedirs(normal_np_dir)
-
 
 
 data = np.sort(os.listdir(np_dir))
@@ -45,8 +44,8 @@ normal_d = []
 for i in range(len(data)):
     name = data[i]
     if os.path.exists(f"{normal_np_dir}{name}.npy"):
-         print(name + " already done.")
-         continue
+        print(name + " already done.")
+        continue
     print(name)
     date_str = name.split('_')
     date_str = date_str[1] + date_str[2]
