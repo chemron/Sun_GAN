@@ -145,7 +145,8 @@ def normalise_EUVI_p(zero_point, percentiles):
 
 
 def get_data(dir, date, mode):
-    return f"{mode}_{date.year}.{date.month:0>2}.{date.day:0>2}_{date.hour:0>2}:{date.minute:0>2}.{date.second:0>2}.npy"
+    return f"{mode}_{date.year}.{date.month:0>2}.{date.day:0>2}_" \
+           f"{date.hour:0>2}:{date.minute:0>2}.{date.second:0>2}.npy"
 
 
 def normalise_data(mode, rolling_75p, clip_max, zero_point, datetime_dates):
@@ -164,16 +165,11 @@ def normalise_data(mode, rolling_75p, clip_max, zero_point, datetime_dates):
     normal_p = []
     normal_d = []
 
-    for i in range(len(data)):
-
-        # what we need to divide by to normalise with clip_max at 1
-        name = data[i]
-        date_str = name.split('_')
-        date_str = date_str[1] + date_str[2]
-        date = datetime.strptime(date_str, '%Y.%m.%d%H:%M:%S.npy')
+    for name, date, percentile in zip(data, datetime_dates, rolling_75p):
         save_name = f'{mode}_{date.year}.{date.month:0>2}.{date.day:0>2}_' \
                     f'{date.hour:0>2}:{date.minute:0>2}:{date.second:0>2}'
-        divider = rolling_75p[i] * clip_max
+        # what we need to divide by to normalise with clip_max at 1
+        divider = percentile * clip_max
         filename = np_dir + name
         img = np.load(filename)
         img -= zero_point
