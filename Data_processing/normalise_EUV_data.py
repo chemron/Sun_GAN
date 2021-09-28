@@ -127,7 +127,7 @@ def rolling_list(lst, k):
         yield max(current_lst)
 
 
-def normalise_EUVI_p(zero_point, percentiles, datetime_dates):
+def normalise_EUVI_p(zero_point, percentiles):
     # normalise the percentiles of EUVI data
 
     # adjust to match AIA zero point
@@ -144,14 +144,18 @@ def normalise_EUVI_p(zero_point, percentiles, datetime_dates):
     return rolling_75p, clip_max
 
 
-def normalise_data(mode, rolling_75p, clip_max, outlier_indicies, zero_point):
+def get_data(dir, date, mode):
+    return f"{mode}_{date.year}.{date.month:0>2}.{date.day:0>2}_{date.hour:0>2}:{date.minute:0>2}.{date.second:0>2}.npy"
+
+
+def normalise_data(mode, rolling_75p, clip_max, zero_point, datetime_dates):
     w = h = 1024  # desired width and height of output
     np_dir = f"Data/np_{mode}/"
     normal_np_dir = f"Data/np_{mode}_normalised/"
     os.makedirs(normal_np_dir) if not os.path.exists(normal_np_dir) else None
 
-    data = np.sort(os.listdir(np_dir))
-    data = np.delete(data, outlier_indicies)
+    data = np.array([get_data(np_dir, date, mode) for date in datetime_dates])
+
     print(len(data))
     print(len(rolling_75p))
     assert len(rolling_75p) == len(data)
@@ -219,25 +223,24 @@ if __name__ == '__main__':
 
     # get percentage of data below zero for each data
     min_p_file = "Data/np_objects/AIA_minp"
-    if not os.path.isfile(min_p_file):
+    if not os.path.isfile(f"{min_p_file}.npy"):
         get_AIA_min_p(AIA_outlier_i, min_p_file, n)
     # get percentile of EUVI data that matches the AIA zeros
     EUVI_zeros_file = "Data/np_objects/EUVI_zeros"
-    if not os.path.isfile(EUVI_zeros_file):
+    if not os.path.isfile(f"{EUVI_zeros_file}.npy"):
         get_EUVI_zeros(min_p_file, EUVI_zeros_file, EUVI_outlier_i)
 
     zero_point = np.load(f"{EUVI_zeros_file}.npy")
     zero_point = np.average(zero_point)
     zero_point = int(np.round(zero_point))
     # get rolling average of 75th percentile, clip max
-    EUVI_rolling_75p, clip_max = normalise_EUVI_p(zero_point, EUVI_p,
-                                                  EUVI_dates)
+    EUVI_rolling_75p, clip_max = normalise_EUVI_p(zero_point, EUVI_p)
     AIA_rolling_75p = moving_average(AIA_p[8], n)
 
     mask = get_mask(size)
     # normalise AIA data
-    normalise_data("AIA", AIA_rolling_75p, clip_max, AIA_outlier_i, 0)
+    normalise_data("AIA", AIA_rolling_75p, clip_max, 0, AIA_dates)
 
     # normalise EUVI data
     normalise_data("EUVI", EUVI_rolling_75p, clip_max,
-                   EUVI_outlier_i, zero_point)
+                   zero_point, EUVI_dates)
