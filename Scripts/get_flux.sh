@@ -11,7 +11,7 @@
 #SBATCH --mem=30G
 
 # Set your minimum acceptable walltime, format: day-hours:minutes:seconds
-#SBATCH --time=30:00:00
+#SBATCH --time=10:00:00
 
 #SBATCH --mail-user=csmi0005@student.monash.edu
 #SBATCH --mail-type=FAIL
@@ -35,6 +35,18 @@ conda config --add pkgs_dirs /home/csmi0005/Mona0028/csmi0005/conda/pkgs
 # activate conda environment
 conda activate ./Data_env
 
+model="UV_GAN_1"
+iters=("0050000" "0100000" "0150000" "0200000" "0250000" "0300000" "0350000" "0400000" "0450000" "0500000")
+
+    echo 'Getting flux for hmi.np_path_normal'
 python Data_processing/get_unsigned_flux.py \
-    --data 'aia.UV_GAN_1_iter_0000020_path' 'euvi.UV_GAN_1_iter_0000020_path' \
-        'hmi.np_path_normal' 'phase_map.Seismic_GAN_1_iter_0000020_path'
+    --data 'hmi.np_path_normal'
+
+# flux according to UV GAN
+for iter in ${iters[@]}
+do
+    echo 'Getting flux for'
+    echo 'hmi.np_path_normal' "aia.${model}_iter_${iter}_path" "euvi.${model}_iter_${iter}_path"
+    python Data_processing/get_unsigned_flux.py \
+        --data 'hmi.np_path_normal' "aia.${model}_iter_${iter}_path" "euvi.${model}_iter_${iter}_path"
+done
