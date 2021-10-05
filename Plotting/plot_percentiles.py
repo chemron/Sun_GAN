@@ -1,14 +1,14 @@
-from datetime import datetime
 import numpy as np
 import matplotlib.pyplot as plt
-import argparse
 
-modes = ["AIA", "AIA_normal", "EUVI", "EUVI_normal", "HMI", "HMI_normal", "phase_map", "phase_map_normal"]
+modes = ["AIA", "AIA_normal", "EUVI", "EUVI_normal", "HMI",
+         "HMI_normal", "phase_map", "phase_map_normal"]
 
 q = [0, 0.01, 0.1, 1, 5, 10, 25, 50, 75, 90, 95, 99, 99.9, 99.99, 100]
 
 for mode in modes:
-    percentiles = np.load(f"Data/np_objects/{mode}_percentiles.npy", allow_pickle=True).T
+    percentiles = np.load(f"Data/np_objects/{mode}_percentiles.npy",
+                          allow_pickle=True).T
     plt_dates = np.load(f"Data/np_objects/{mode}_dates.npy", allow_pickle=True)
 
     # plot percentiles vs dates
@@ -16,8 +16,8 @@ for mode in modes:
 
     for i in range(len(percentiles)-1, -1, -1):
         ax.plot_date(plt_dates, percentiles[i],
-                        label=f'${q[i]}$th percentile',
-                        markersize=1)
+                     label=f'${q[i]}$th percentile',
+                     markersize=1)
     ax.set_ylabel("Pixel Intensity")
 
     # GET TICkS
