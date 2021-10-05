@@ -41,10 +41,11 @@ def get_flux(data, save_path):
 
         fluxes.append(total_flux)
         dates.append(date)
-    
+
     np.save(save_path, [fluxes, dates])
 
-save_dir = f"Data/unsigned_flux/"
+
+save_dir = "Data/unsigned_flux/"
 os.makedirs(save_dir) if not os.path.exists(save_dir) else None
 
 shape = (1024, 1024)

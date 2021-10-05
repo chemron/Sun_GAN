@@ -1,4 +1,3 @@
-import sys
 import numpy as np
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
@@ -22,7 +21,6 @@ parser.add_argument("--data",
 args = parser.parse_args()
 
 
-
 def moving_average(fluxes, dates, dt):
     av_flux = np.zeros_like(fluxes)
     for i, date in enumerate(dates):
@@ -35,13 +33,12 @@ def moving_average(fluxes, dates, dt):
     return av_flux
 
 
-
 def get_data(path):
     fluxes, dates = np.load(path)
     fluxes = fluxes.astype('float64')
     dates = np.array([datetime.strptime(time, "%Y.%m.%d_%H:%M:%S")
                       for time in dates])
-    
+
     dt = timedelta(days=27.2/2)
     av_fluxes = moving_average(fluxes, dates, dt)
 

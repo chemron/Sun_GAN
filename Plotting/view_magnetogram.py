@@ -8,6 +8,7 @@ plt.switch_backend("agg")
 cmap = copy.copy(mpl.cm.get_cmap("seismic"))
 cmap.set_bad(color='k')
 
+
 def get_mask(shape):
     h, w = shape
     center = (int(w/2), int(h/2))
