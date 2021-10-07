@@ -15,7 +15,7 @@
 #SBATCH --mem=10G
 
 # Set your minimum acceptable walltime, format: day-hours:minutes:seconds
-#SBATCH --time=90:00:00
+#SBATCH --time=100:00:00
 # SBATCH --time=00:00:20
 
 #SBATCH --mail-user=csmi0005@student.monash.edu
@@ -27,8 +27,8 @@ module load tensorflow/2.3.0
 
 python Training/train.py \
     --model_name "UV_GAN_1" \
-    --display_iter 5 \
-    --max_iter 20 \
+    --display_iter 50000 \
+    --max_iter 500000 \
     --batch_size 1 \
     --tol 3 \
     --input "aia.np_path_normal" \
