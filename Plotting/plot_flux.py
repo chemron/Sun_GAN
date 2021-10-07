@@ -11,10 +11,9 @@ parser.add_argument("--data",
                     nargs='+',
                     help="sql column of data paths to use ",
                     default=[
-                        'aia.UV_GAN_1_iter_0000020_path',
-                        'euvi.UV_GAN_1_iter_0000020_path',
+                        'aia.UV_GAN_1_iter_0050000_path',
+                        'euvi.UV_GAN_1_iter_0050000_path',
                         'hmi.np_path_normal',
-                        'phase_map.Seismic_GAN_1_iter_0000020_path'
                     ]
                     )
 
@@ -25,9 +24,6 @@ def moving_average(fluxes, dates, dt):
     av_flux = np.zeros_like(fluxes)
     for i, date in enumerate(dates):
         indices = np.where(abs(dates - date) < dt)[0]
-        print(type(fluxes), fluxes)
-        print(indices)
-        print(fluxes[indices])
         av_flux[i] = np.average(fluxes[indices])
 
     return av_flux
@@ -84,7 +80,7 @@ ax.set_ylabel(r"Flux [$G.m^2 \times 10^{19}$]")
 # colours
 # cmap = list(plt.get_cmap("tab10").colors)
 cmap = [
-    'lightblue', 'navajowhite', 'mediumseagreen', 'lightcoral', 'plum',
+    'lightblue', 'navajowhite', 'palegreen', 'lightcoral', 'plum',
     'sandybrown', 'pink', 'lightgray', 'khaki', 'powderblue'
     ]
 c = 0
@@ -110,9 +106,9 @@ for i, data_type in enumerate(args.data):
 #     title_str += " with ~27 day rolling average"
 # plt.title(title_str)
 
+plt.ylim(1.5, 6)
 plt.tight_layout
 plt.legend()
-
 
 plt.savefig("Plots/fluxes.png", dpi=300)
 
