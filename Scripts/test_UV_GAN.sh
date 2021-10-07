@@ -50,6 +50,6 @@ python Training/test.py \
 
 # apply mask to outputs
 python Data_processing/apply_mask.py \
-    --data "euvi.UV_GAN_1_iter_500000_path"
+    --data "euvi.UV_GAN_1_iter_0500000_path"
 
 # data: data to apply mask to ([sql table].[column])
