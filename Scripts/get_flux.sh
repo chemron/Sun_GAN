@@ -38,7 +38,7 @@ conda activate ./Data_env
 model="UV_GAN_1"
 iters=("0050000" "0100000" "0150000" "0200000" "0250000" "0300000" "0350000" "0400000" "0450000" "0500000")
 
-    echo 'Getting flux for hmi.np_path_normal'
+echo 'Getting flux for hmi.np_path_normal'
 python Data_processing/get_unsigned_flux.py \
     --data 'hmi.np_path_normal'
 
@@ -46,7 +46,7 @@ python Data_processing/get_unsigned_flux.py \
 for iter in ${iters[@]}
 do
     echo 'Getting flux for'
-    echo 'hmi.np_path_normal' "aia.${model}_iter_${iter}_path" "euvi.${model}_iter_${iter}_path"
+    echo "aia.${model}_iter_${iter}_path" "euvi.${model}_iter_${iter}_path"
     python Data_processing/get_unsigned_flux.py \
-        --data 'hmi.np_path_normal' "aia.${model}_iter_${iter}_path" "euvi.${model}_iter_${iter}_path"
+        --data "aia.${model}_iter_${iter}_path" "euvi.${model}_iter_${iter}_path"
 done
