@@ -1,9 +1,9 @@
 import numpy as np
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
-from matplotlib.dates import (MONTHLY, DAILY, DateFormatter,
-                              rrulewrapper, RRuleLocator)
+from matplotlib.dates import DateFormatter
 import argparse
+import os
 
 
 parser = argparse.ArgumentParser()
@@ -16,6 +16,9 @@ parser.add_argument("--data",
                         'hmi.np_path_normal',
                     ]
                     )
+parser.add_argument("--name",
+                    help="save name",
+                    default="fluxes")
 
 args = parser.parse_args()
 
@@ -55,15 +58,24 @@ def get_data(path):
 #     n_x = len(x_dates)
 #     for i in range(n_x):
 #         x_date = x_dates[i]
-#         ax.axvline(x_date, c='tab:gray', label="x class flare" if i==0 else "", linestyle='--', alpha=1, zorder=0)
+#         ax.axvline(x_date, c='tab:gray',
+#                    label="x class flare" if i==0 else "",
+#                    linestyle='--',
+#                    alpha=1,
+#                    zorder=0
+#                    )
 
 
 def find_nearest(array, value):
     idx = np.searchsorted(array, value, side="left")
-    if idx > 0 and (idx == len(array) or abs(value - array[idx-1]) < abs(value - array[idx])):
+    if (idx > 0 and (
+            idx == len(array) or
+            abs(value - array[idx-1]) < abs(value - array[idx])
+            )):
         return idx-1, array[idx-1]
     else:
         return idx, array[idx]
+
 
 # set up figure
 fig, ax = plt.subplots(1, figsize=(15, 8))
@@ -97,8 +109,11 @@ for i, data_type in enumerate(args.data):
     save_path = f"Data/unsigned_flux/flux_{instrument}_{mode}.npy"
     label = instrument.upper().replace("_", " ") + " magnetogram"
     date, flux, av_flux = get_data(save_path)
-    plt.scatter(date, flux/1e19, label=f"Flux according to {label}", s=4, alpha=0.8,color=cmap[i], zorder=10)
-    plt.plot(date, av_flux/1e19, label=f"27 day average flux according to {label}", zorder=10)
+    plt.scatter(date, flux/1e19, label=f"Flux according to {label}", s=4,
+                alpha=0.8, color=cmap[i], zorder=10)
+    plt.plot(date, av_flux/1e19,
+             label=f"27 day average flux according to {label}",
+             zorder=10)
 
 
 # title_str = "Total Unsigned Magnetic Flux vs Time"
@@ -110,7 +125,9 @@ plt.ylim(1.5, 6)
 plt.tight_layout
 plt.legend()
 
-plt.savefig("Plots/fluxes.png", dpi=300)
+save_dir = "Plots/flux/"
+os.makedirs(save_dir) if not os.path.exists(save_dir) else None
+plt.savefig(f"Plots/{args.name}.png", dpi=300)
 
 
 # fig.set_size_inches(6, 10)
@@ -118,4 +135,3 @@ plt.savefig("Plots/fluxes.png", dpi=300)
 # end = datetime(2012, 7, 25)
 # plt.xlim(start, end)
 # plt.savefig(f"peaktrough", dpi=300)
-
