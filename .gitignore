@@ -4,6 +4,7 @@ Data_env/
 *.png
 Plots/*
 image.db
+image.db-journal
 Models/
 test.sh
 *.out
