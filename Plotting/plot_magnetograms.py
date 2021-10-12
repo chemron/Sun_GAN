@@ -19,6 +19,10 @@ os.makedirs(png_dir) if not os.path.exists(png_dir) else None
 
 for filename in os.listdir(np_dir):
     mag_plot.plot_magnetogram(filename, v)
+    name = filename.strip(".npy")
+    print(name)
+    plt.savefig(f"{png_dir}/{name}.png")
+    plt.clf()
 
 
 # def get_mask(shape):
