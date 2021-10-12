@@ -127,7 +127,7 @@ plt.legend()
 
 save_dir = "Plots/flux/"
 os.makedirs(save_dir) if not os.path.exists(save_dir) else None
-plt.savefig(f"Plots/{args.name}.png", dpi=300)
+plt.savefig(f"{save_dir}{args.name}.png", dpi=300)
 
 
 # fig.set_size_inches(6, 10)

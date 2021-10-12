@@ -1,7 +1,8 @@
 Data/*
 Data_env/
 */__pycache__/*
-*/*.png
+*.png
+Plots/*
 image.db
 Models/
 test.sh
