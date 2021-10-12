@@ -36,30 +36,17 @@ conda config --add pkgs_dirs /home/csmi0005/Mona0028/csmi0005/conda/pkgs
 conda activate ./Data_env
 
 
-# model="UV_GAN_1"
-# iters=("0050000" "0100000" "0150000" "0200000" "0250000" "0300000" "0350000" "0400000" "0450000" "0500000")
-
-
-# # flux according to UV GAN
-# for iter in ${iters[@]}
-# do
-#     echo "Plotting flux for iter ${iter}"
-#     python Plotting/plot_flux.py \
-#         --data 'hmi.np_path_normal' "euvi.${model}_iter_${iter}_path" \
-#         --name "euvi_flux_${model}_${iter}"
-#     python Plotting/plot_flux.py \
-#         --data 'hmi.np_path_normal' "aia.${model}_iter_${iter}_path" \
-#         --name "aia_flux_${model}_${iter}"
-# done
-
-
 model="UV_GAN_1"
-iters=("0500000")
+iters=("0050000" "0100000" "0150000" "0200000" "0250000" "0300000" "0350000" "0400000" "0450000" "0500000")
 
 
 # flux according to UV GAN
 for iter in ${iters[@]}
 do
+    echo "Plotting flux for iter ${iter}"
+    python Plotting/plot_flux.py \
+        --data 'hmi.np_path_normal' "euvi.${model}_iter_${iter}_path" \
+        --name "euvi_flux_${model}_${iter}"
     python Plotting/plot_flux.py \
         --data 'hmi.np_path_normal' "aia.${model}_iter_${iter}_path" \
         --name "aia_flux_${model}_${iter}"
