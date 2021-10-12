@@ -8,13 +8,15 @@
 
 # Request for GPU,
 #SBATCH --partition=gpu
-#SBATCH --gres=gpu:P100:1
+# SBATCH --gres=gpu:P100:1
+#SBATCH --gres=gpu:K80:1
+
 
 # Memory usage (MB)
 #SBATCH --mem=30G
 
 # Set your minimum acceptable walltime, format: day-hours:minutes:seconds
-#SBATCH --time=05:00:00
+#SBATCH --time=12:00:00
 
 #SBATCH --mail-user=csmi0005@student.monash.edu
 #SBATCH --mail-type=FAIL
@@ -29,9 +31,9 @@ python Training/test.py \
     --model_name 'Seismic_GAN_1' \
     --input_data 'phase_map.np_path_normal' \
     --test_on_all \
-    --display_iter 5 \
+    --display_iter 50000 \
     --start_iter 0 \
-    --max_iter 20
+    --max_iter 500000
 
 # input data: sql data name (table.column)
 # test on all: either test on all the input data, or just the test data (i.e data from october or november)
