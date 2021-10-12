@@ -21,15 +21,18 @@ def plot_comparison(synthetic_mag, true_mag, v):
         plt.figure(figsize=(15, 5))
 
         # plot synthetic mag
+        
         plt.subplot(1, 2, 1)
+        plt.title(r"Predicted line-of-sight Magnetic field [$G$]")
         mag_plot.plot_magnetogram(synthetic_mag, v)
 
         # plot true mag
         plt.subplot(1, 2, 2)
+        plt.title(r"True line-of-sight Magnetic field [$G$]")
         mag_plot.plot_magnetogram(true_mag, v)
 
         print(name)
-        plt.savefig(f"{png_dir}/{name}.png")
+        plt.savefig(f"{png_dir}/{name}.png", dpi=300)
         plt.clf()
 
 
@@ -60,8 +63,12 @@ GROUP BY
 """
 
 UV_GAN_magnetograms = execute_read_query(connection, select_UV_GAN)
+Seismic_GAN_magnetograms = execute_read_query(connection, select_Seismic_GAN)
 
 
 v = 4000
 for synthetic_mag, true_mag in UV_GAN_magnetograms:
+    plot_comparison(synthetic_mag, true_mag, v)
+
+for synthetic_mag, true_mag in Seismic_GAN_magnetograms:
     plot_comparison(synthetic_mag, true_mag, v)

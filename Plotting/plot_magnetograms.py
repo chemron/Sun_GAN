@@ -16,5 +16,5 @@ for filename in os.listdir(np_dir):
     mag_plot.plot_magnetogram(f"{np_dir}/{filename}", v)
     name = filename.strip(".npy")
     print(name)
-    plt.savefig(f"{png_dir}/{name}.png")
+    plt.savefig(f"{png_dir}/{name}.png", dpi=300)
     plt.clf()
