@@ -18,7 +18,7 @@ def plot_comparison(synthetic_mag, true_mag, v):
         os.makedirs(png_dir) if not os.path.exists(png_dir) else None
 
         # setup figure
-        plt.figure(figsize=(15, 5))
+        plt.figure(1, figsize=(15, 5))
 
         # plot synthetic mag
         
@@ -33,7 +33,7 @@ def plot_comparison(synthetic_mag, true_mag, v):
 
         print(name)
         plt.savefig(f"{png_dir}/{name}.png", dpi=300)
-        plt.clf()
+        plt.close(1)
 
 
 select_UV_GAN = """

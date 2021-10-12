@@ -8,7 +8,7 @@
 # SBATCH --partition=short,comp
 
 # Memory usage (MB)
-#SBATCH --mem=10G
+#SBATCH --mem=15G
 
 # Set your minimum acceptable walltime, format: day-hours:minutes:seconds
 #SBATCH --time=10:00:00
