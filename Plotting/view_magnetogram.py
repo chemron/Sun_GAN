@@ -5,6 +5,8 @@ import copy
 import os
 plt.switch_backend("agg")
 
+clip_max = np.load("Data/np_objects/HMI_clip_max.npy")
+
 cmap = copy.copy(mpl.cm.get_cmap("seismic"))
 cmap.set_bad(color='k')
 
@@ -23,6 +25,9 @@ os.makedirs("Plots/") if not os.path.exists("Plots/") else None
 filename = input("File path: ")
 name = filename.split("/")[-1]
 arr = np.load(filename)
+arr = np.abs(arr)**2
+arr *= clip_max
+
 v = np.max(np.nan_to_num(np.abs(arr)))
 mask = get_mask(arr.shape)
 arr[~mask] = np.nan
