@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=flux
+#SBATCH --job-name=plot_flux
 
 # Request CPU resource for a serial job
 #SBATCH --ntasks=1
@@ -8,10 +8,10 @@
 # SBATCH --partition=short,comp
 
 # Memory usage (MB)
-#SBATCH --mem=30G
+#SBATCH --mem=10G
 
 # Set your minimum acceptable walltime, format: day-hours:minutes:seconds
-#SBATCH --time=5:00:00
+#SBATCH --time=00:20:00
 
 #SBATCH --mail-user=csmi0005@student.monash.edu
 #SBATCH --mail-type=FAIL
@@ -35,6 +35,7 @@ conda config --add pkgs_dirs /home/csmi0005/Mona0028/csmi0005/conda/pkgs
 # activate conda environment
 conda activate ./Data_env
 
+
 model="Seismic_GAN_1"
 iters=("0050000" "0100000" "0150000" "0200000" "0250000" "0300000" "0350000" "0400000" "0450000" "0500000")
 
@@ -42,8 +43,9 @@ iters=("0050000" "0100000" "0150000" "0200000" "0250000" "0300000" "0350000" "04
 # flux according to UV GAN
 for iter in ${iters[@]}
 do
-    echo 'Getting flux for'
-    echo "phase_map.${model}_iter_${iter}_path"
-    python Data_processing/get_unsigned_flux.py \
-        --data "phase_map.${model}_iter_${iter}_path"
+    echo "Plotting flux for iter ${iter}"
+    python Plotting/plot_flux.py \
+        --data 'hmi.np_path_normal' "phase_map.${model}_iter_${iter}_path" \
+        --name "seismic_flux_${model}_${iter}"
+
 done
