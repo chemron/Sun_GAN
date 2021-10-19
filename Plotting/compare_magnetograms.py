@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
 import os
-import Plotting.plot_specific_magnetogram as mag_plot
-from Data_processing.sql_util import create_connection, execute_read_query
+import sys
+sys.path.insert(1, './Data_processing')
+import plot_specific_magnetogram as mag_plot
+from sql_util import create_connection, execute_read_query
 import argparse
 
 connection = create_connection("./image.db")

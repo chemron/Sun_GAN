@@ -39,10 +39,11 @@ iters=("0050000" "0100000" "0150000" "0200000" "0250000" "0300000" "0350000" "04
 UV_GAN_model='UV_GAN_1'
 Seismic_GAN_model='Seismic_GAN_1'
 
-for iter ${iters[@]}
+for iter in ${iters[@]}
 do
     python Plotting/compare_magnetograms.py \
         --UV_GAN_iter $iter \
         --UV_GAN_model $UV_GAN_model \
         --Seismic_GAN_iter $iter \
-        --Seismic_GAN_model $Seismic_GAN_iter
+        --Seismic_GAN_model $Seismic_GAN_model
+done
