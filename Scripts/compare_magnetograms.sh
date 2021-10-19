@@ -11,7 +11,7 @@
 #SBATCH --mem=15G
 
 # Set your minimum acceptable walltime, format: day-hours:minutes:seconds
-#SBATCH --time=10:00:00
+#SBATCH --time=20:00:00
 
 #SBATCH --mail-user=csmi0005@student.monash.edu
 #SBATCH --mail-type=FAIL

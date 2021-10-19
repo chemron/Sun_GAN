@@ -1,13 +1,15 @@
 import matplotlib.pyplot as plt
 import os
 import sys
+import argparse
+import gc
+import matplotlib
 sys.path.insert(1, './Data_processing')
 import plot_specific_magnetogram as mag_plot
 from sql_util import create_connection, execute_read_query
-import argparse
 
 connection = create_connection("./image.db")
-plt.switch_backend("agg")
+matplotlib.use('Agg')
 
 
 parser = argparse.ArgumentParser()
@@ -50,13 +52,19 @@ def plot_comparison(synthetic_mag, true_mag, v):
             f"{png_dir}/{name}.png", dpi=300,
             facecolor="w", bbox_inches='tight'
             )
-        plt.close(1)
+        plt.cla()
+        plt.clf()
+        plt.close('all')
+        plt.close(fig)
+        del fig, cbar
+        gc.collect()
 
 
 if __name__ == "__main__":
     UV_GAN_str = f"{args.UV_GAN_model}_iter_{args.UV_GAN_iter:0>7}_path"
     print("UV GAN string: ", UV_GAN_str)
-    Seismic_GAN_str = f"{args.Seismic_GAN_model}_iter_{args.Seismic_GAN_iter:0>7}_path"
+    Seismic_GAN_str = \
+        f"{args.Seismic_GAN_model}_iter_{args.Seismic_GAN_iter:0>7}_path"
     print("Seismic GAN string: ", Seismic_GAN_str)
 
     select_UV_GAN = f"""

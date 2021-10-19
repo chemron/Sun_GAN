@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 import copy
 import os
 plt.switch_backend("agg")
@@ -21,15 +20,13 @@ def plot_magnetogram(filename, v, colorbar=True):
     arr = np.load(filename)
     arr = np.sign(arr)*(arr**2)
     arr *= clip_max
-    mask = get_mask(arr.shape)
     arr[~mask] = np.nan
-    im = plt.imshow(arr, cmap=cmap, interpolation='none', vmin=-v, vmax=v)
+    plt.imshow(arr, cmap=cmap, interpolation='none', vmin=-v, vmax=v)
     plt.axis('off')
+    del arr
     if colorbar:
-        ax = plt.gca()
-        divider = make_axes_locatable(ax)
-        cax = divider.append_axes("right", size="5%", pad=0.05)
-        plt.colorbar(im, cax=cax)
+        cbar = plt.colorbar(ax=plt.gca(), shrink=0.8)
+        cbar.set_label(r"Magnetic Field Strength [$G$]")
 
 
 mask = get_mask((1024, 1024))
