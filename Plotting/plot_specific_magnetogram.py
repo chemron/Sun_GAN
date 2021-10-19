@@ -17,7 +17,7 @@ def get_mask(shape):
     return mask
 
 
-def plot_magnetogram(filename, v):
+def plot_magnetogram(filename, v, colorbar=True):
     arr = np.load(filename)
     arr = np.sign(arr)*(arr**2)
     arr *= clip_max
@@ -25,10 +25,11 @@ def plot_magnetogram(filename, v):
     arr[~mask] = np.nan
     im = plt.imshow(arr, cmap=cmap, interpolation='none', vmin=-v, vmax=v)
     plt.axis('off')
-    ax = plt.gca()
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    plt.colorbar(im, cax=cax)
+    if colorbar:
+        ax = plt.gca()
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        plt.colorbar(im, cax=cax)
 
 
 mask = get_mask((1024, 1024))

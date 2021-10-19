@@ -1,11 +1,15 @@
 import matplotlib.pyplot as plt
 import os
-import plot_specific_magnetogram as mag_plot
-import sys
-sys.path.insert(1, './Data_processing')
-from sql_util import create_connection, execute_read_query
+import Plotting.plot_specific_magnetogram as mag_plot
+from Data_processing.sql_util import create_connection, execute_read_query
 connection = create_connection("./image.db")
+# from mpl_toolkits.axes_grid1 import make_axes_locatable
 plt.switch_backend("agg")
+
+UV_GAN_iter = 500000
+UV_GAN_model = "UV_GAN_1"
+Seismic_GAN_iter = 500000
+Seismic_GAN_model = "Seismic_GAN_1"
 
 
 def plot_comparison(synthetic_mag, true_mag, v):
@@ -18,27 +22,37 @@ def plot_comparison(synthetic_mag, true_mag, v):
         os.makedirs(png_dir) if not os.path.exists(png_dir) else None
 
         # setup figure
-        plt.figure(1, figsize=(15, 5))
+        fig = plt.figure(1, figsize=(10, 5))
 
         # plot synthetic mag
-        
+
         plt.subplot(1, 2, 1)
-        plt.title(r"Predicted line-of-sight Magnetic field [$G$]")
-        mag_plot.plot_magnetogram(synthetic_mag, v)
+        plt.title(r"Predicted line-of-sight Magnetic field")
+        mag_plot.plot_magnetogram(synthetic_mag, v, colorbar=False)
 
         # plot true mag
         plt.subplot(1, 2, 2)
-        plt.title(r"True line-of-sight Magnetic field [$G$]")
-        mag_plot.plot_magnetogram(true_mag, v)
+        plt.title(r"True line-of-sight Magnetic field")
+        mag_plot.plot_magnetogram(true_mag, v, colorbar=False)
 
+        # plot colorbar
+        cbar = plt.colorbar(ax=fig.axes, shrink=0.8)
+        cbar.set_label(r"Magnetic Field Strength [$G$]") 
         print(name)
-        plt.savefig(f"{png_dir}/{name}.png", dpi=300)
+        plt.tight_layout
+        plt.savefig(
+            f"{png_dir}/{name}.png", dpi=300,
+            facecolor="w", bbox_inches='tight'
+            )
         plt.close(1)
 
 
-select_UV_GAN = """
+UV_GAN_str = f"{UV_GAN_model}_iter_{UV_GAN_iter:0>7}_path"
+Seismic_GAN_str = f"{Seismic_GAN_model}_iter_{Seismic_GAN_iter:0>7}_path"
+
+select_UV_GAN = f"""
 SELECT
-    aia.UV_GAN_1_iter_0500000_path,
+    aia.{UV_GAN_str},
     hmi.np_path_normal
 FROM
     aia,
@@ -49,10 +63,10 @@ GROUP BY
     hmi.id
 """
 
-select_Seismic_GAN = """
+select_Seismic_GAN = f"""
 SELECT
-    phase_map.Seismic_GAN_1_iter_0500000_path,
-    euvi.UV_GAN_1_iter_0500000_path
+    phase_map.{Seismic_GAN_str},
+    euvi.{UV_GAN_str}
 FROM
     phase_map,
     euvi
@@ -62,13 +76,16 @@ GROUP BY
     euvi.id
 """
 
-UV_GAN_magnetograms = execute_read_query(connection, select_UV_GAN)
-Seismic_GAN_magnetograms = execute_read_query(connection, select_Seismic_GAN)
 
+if __name__ == "__main__":
+    UV_GAN_magnetograms = execute_read_query(connection,
+                                             select_UV_GAN)
+    Seismic_GAN_magnetograms = execute_read_query(connection,
+                                                  select_Seismic_GAN)
 
-v = 4000
-for synthetic_mag, true_mag in UV_GAN_magnetograms:
-    plot_comparison(synthetic_mag, true_mag, v)
+    v = 4000
+    for synthetic_mag, true_mag in UV_GAN_magnetograms:
+        plot_comparison(synthetic_mag, true_mag, v)
 
-for synthetic_mag, true_mag in Seismic_GAN_magnetograms:
-    plot_comparison(synthetic_mag, true_mag, v)
+    for synthetic_mag, true_mag in Seismic_GAN_magnetograms:
+        plot_comparison(synthetic_mag, true_mag, v)
