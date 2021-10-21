@@ -1,6 +1,5 @@
-See [my honours
 # Sun_GAN
-thesis](https://github.com/chemron/honours_thesis/blob/master/thesis.pdf) for a
+See [my honoursthesis](https://github.com/chemron/honours_thesis/blob/master/thesis.pdf) for a
 full description of the system. 
 ## Environments
   
@@ -11,8 +10,8 @@ environment can be constructed from `requirements.txt` or using the command:
 `conda create --prefix ./Data_env`  
 `conda config --add channels conda-forge`  
 `conda install sunpy=3.0.1 astropy=4.3.post1 numpy=1.21.1 drms=0.6.2
-opencv=4.5.2 matplotlib=3.4.2`  
-requests=2.26.0 scikit-image=0.18.2 imageio=2.9.0 pandas=1.3.1 pillow=8.3.1
+opencv=4.5.2 matplotlib=3.4.2 requests=2.26.0 scikit-image=0.18.2 imageio=2.9.0
+pandas=1.3.1 pillow=8.3.1`
   
   
 ### Training/Testing
@@ -23,9 +22,8 @@ following commands:
 `module load anaconda/5.1.0-Python3.6-gcc5`  
 `module load cudnn/7.6.5-cuda10.1`  
 `module load tensorflow/2.3.0`  
-These can similarly be unloaded by using the commands: `module unload  
-  
-anaconda/5.1.0-Python3.6-gcc5`  
+These can similarly be unloaded by using the commands:  
+`module unload anaconda/5.1.0-Python3.6-gcc5`  
 `module unload cudnn/7.6.5-cuda10.1`  
 `module unload tensorflow/2.3.0`  
   
