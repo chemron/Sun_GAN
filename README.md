@@ -1,5 +1,5 @@
 # Sun_GAN
-See [my honoursthesis](https://github.com/chemron/honours_thesis/blob/master/thesis.pdf) for a
+See [my honours thesis](https://github.com/chemron/honours_thesis/blob/master/thesis.pdf) for a
 full description of the system. 
 ## Environments
   
@@ -110,7 +110,7 @@ before running a full scale model.
 - You can make plots comparing the synthetic magnetograms with the true  
   magnetograms, by running `Scripts/compare_magnetograms.sh`, and specifying the  
   model, and iterations. The output will be in the folder:    
-  `Data/[model]_on_[testing_set]/ITER[iteration]_comparison`  
+  `Data/[model]_on_[testing set]/ITER[iteration]_comparison`  
   
 ### Miscellaneous Plotting:
 - Plot percentiles of the different data types:  
