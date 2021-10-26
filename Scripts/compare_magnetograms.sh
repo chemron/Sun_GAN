@@ -11,7 +11,7 @@
 #SBATCH --mem=15G
 
 # Set your minimum acceptable walltime, format: day-hours:minutes:seconds
-#SBATCH --time=20:00:00
+#SBATCH --time=40:00:00
 
 #SBATCH --mail-user=csmi0005@student.monash.edu
 #SBATCH --mail-type=FAIL
@@ -35,7 +35,8 @@ conda config --add pkgs_dirs /home/csmi0005/Mona0028/csmi0005/conda/pkgs
 # activate conda environment
 conda activate ./Data_env
 
-iters=("0050000" "0100000" "0150000" "0200000" "0250000" "0300000" "0350000" "0400000" "0450000" "0500000")
+# iters=("0050000" "0100000" "0150000" "0200000" "0250000" "0300000" "0350000" "0400000" "0450000" "0500000")
+iters=("0300000" "0350000" "0450000")
 UV_GAN_model='UV_GAN_1'
 Seismic_GAN_model='Seismic_GAN_1'
 
@@ -44,6 +45,6 @@ do
     python Plotting/compare_magnetograms.py \
         --UV_GAN_iter $iter \
         --UV_GAN_model $UV_GAN_model \
-        --Seismic_GAN_iter $iter \
-        --Seismic_GAN_model $Seismic_GAN_model
+        # --Seismic_GAN_iter $iter \
+        # --Seismic_GAN_model $Seismic_GAN_model
 done
