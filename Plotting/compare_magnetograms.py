@@ -26,7 +26,7 @@ def plot_comparison(synthetic_mag, true_mag, v):
     path_tree = synthetic_mag.split("/")
     png_dir = "/".join(path_tree[:-1]) + "_comparison/"
     name = path_tree[-1].strip(".npy")
-    filename = {png_dir}/{name}.png
+    filename = f"{png_dir}/{name}.png"
     if os.path.exists(filename):
         print(f"{filename} already exists")
         return
