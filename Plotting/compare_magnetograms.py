@@ -23,41 +23,45 @@ args = parser.parse_args()
 def plot_comparison(synthetic_mag, true_mag, v):
     if (synthetic_mag in (None, "NULL")) or (true_mag in (None, "NULL")):
         return
-    else:
-        path_tree = synthetic_mag.split("/")
-        png_dir = "/".join(path_tree[:-1]) + "_comparison/"
-        name = path_tree[-1].strip(".npy")
-        os.makedirs(png_dir) if not os.path.exists(png_dir) else None
+    path_tree = synthetic_mag.split("/")
+    png_dir = "/".join(path_tree[:-1]) + "_comparison/"
+    name = path_tree[-1].strip(".npy")
+    filename = {png_dir}/{name}.png
+    if os.path.exists(filename):
+        print(f"{filename} already exists")
+        return
 
-        # setup figure
-        fig = plt.figure(1, figsize=(10, 5))
+    os.makedirs(png_dir) if not os.path.exists(png_dir) else None
 
-        # plot synthetic mag
+    # setup figure
+    fig = plt.figure(1, figsize=(10, 5))
 
-        plt.subplot(1, 2, 1)
-        plt.title(r"Predicted line-of-sight Magnetic field")
-        mag_plot.plot_magnetogram(synthetic_mag, v, colorbar=False)
+    # plot synthetic mag
 
-        # plot true mag
-        plt.subplot(1, 2, 2)
-        plt.title(r"True line-of-sight Magnetic field")
-        mag_plot.plot_magnetogram(true_mag, v, colorbar=False)
+    plt.subplot(1, 2, 1)
+    plt.title(r"Predicted line-of-sight Magnetic field")
+    mag_plot.plot_magnetogram(synthetic_mag, v, colorbar=False)
 
-        # plot colorbar
-        cbar = plt.colorbar(ax=fig.axes, shrink=0.8)
-        cbar.set_label(r"Magnetic Field Strength [$G$]")
-        plt.tight_layout
-        plt.savefig(
-            f"{png_dir}/{name}.png", dpi=300,
-            facecolor="w", bbox_inches='tight'
-            )
-        print(f"{png_dir}/{name}.png")
-        plt.cla()
-        plt.clf()
-        plt.close('all')
-        plt.close(fig)
-        del fig, cbar
-        gc.collect()
+    # plot true mag
+    plt.subplot(1, 2, 2)
+    plt.title(r"True line-of-sight Magnetic field")
+    mag_plot.plot_magnetogram(true_mag, v, colorbar=False)
+
+    # plot colorbar
+    cbar = plt.colorbar(ax=fig.axes, shrink=0.8)
+    cbar.set_label(r"Magnetic Field Strength [$G$]")
+    plt.tight_layout
+    plt.savefig(
+        filename, dpi=300,
+        facecolor="w", bbox_inches='tight'
+        )
+    print(filename)
+    plt.cla()
+    plt.clf()
+    plt.close('all')
+    plt.close(fig)
+    del fig, cbar
+    gc.collect()
 
 
 if __name__ == "__main__":
